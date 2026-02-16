@@ -15,7 +15,7 @@ site: distill::distill_website
 
 ## About Me
 
-Welcome to my personal website. I am a student with interests in political science, data analysis, and quantitative methods. This site showcases my academic work, including projects and visualisations from GV300.
+Welcome to my personal github website. I am a final year student who's studying Politics and International Relations and have an interest in data analysis, and quantitative methods. This site showcases a chapter of my academic work, including a homework rmd that i've chosen to showcase as an example of work that I have conducted in the past and visualisations for GV300.
 
 ## Academic Interests
 
@@ -26,4 +26,4 @@ Welcome to my personal website. I am a student with interests in political scien
 
 ## Current Work
 
-I am currently enrolled in GV300, where I apply computational methods to political science questions. Browse my [GV300 Showcase](gv300-showcase.html) to see examples of my best code and visualisations from the course.
+I am currently enrolled in GV300, where I apply computational methods to political science questions. Browse my [GV300 Showcase](gv300-showcase.html) to see the example of my favorite code and visualisations from the course.
