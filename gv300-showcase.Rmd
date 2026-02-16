@@ -1,7 +1,7 @@
 ---
 title: "GV300 Showcase"
 description: |
-  A showcase of my best code and visualisation from GV300 assignments.
+  A showcase of my best code and visualisation from GV300 — analysing UK constituency-level election data.
 author:
   - name: "Bandar J"
 date: 2026-01-26
@@ -18,137 +18,246 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 
 ## Introduction
 
-This page showcases selected work from my GV300 assignments. The examples below demonstrate how I used R to explore political data, perform statistical analysis, and create visualisations. I have chosen pieces that I believe best illustrate my understanding of quantitative methods and my ability to communicate findings effectively.
+This page showcases work from my GV300 Assignment 2, which explored UK general election data at the constituency level. The analysis asked two big questions: **are all votes equal?** and **who isn't voting?** I used R with tidyverse and ggplot2 to clean real parliamentary data, compute summary statistics, and produce visualisations that reveal inequality in constituency sizes and turnout patterns across the four UK nations.
 
 ## Data Preparation
 
-The dataset used here contains country-level indicators commonly studied in comparative politics: GDP per capita, a democracy score (on a 0--10 scale), population, life expectancy, and geographic region. The code below shows how the data were assembled and prepared for analysis.
+The dataset comes directly from the UK Parliament's election results API. It contains candidate-level records from the 2024 general election. The code below loads the raw CSV, cleans column names, removes by-elections, aggregates to constituency level, and computes turnout as a percentage of the registered electorate.
 
 ```{r data-prep}
-# Create a sample dataset of country-level political and economic indicators
-set.seed(42)
+library(tidyverse)
+library(ggplot2)
+library(patchwork)
+library(readr)
+library(stringr)
 
-countries <- c("United States", "United Kingdom", "Germany", "France", "Japan",
-               "Brazil", "India", "South Africa", "Nigeria", "Mexico",
-               "Canada", "Australia", "South Korea", "Sweden", "Norway",
-               "Egypt", "Turkey", "Indonesia", "Argentina", "Poland")
+# Load raw data from Parliament API
+uk_csv <- "https://electionresults.parliament.uk/general-elections/6/candidacies.csv"
+uk_raw <- readr::read_csv(uk_csv, show_col_types = FALSE)
 
-regions <- c("North America", "Europe", "Europe", "Europe", "Asia",
-             "South America", "Asia", "Africa", "Africa", "North America",
-             "North America", "Oceania", "Asia", "Europe", "Europe",
-             "Africa", "Europe", "Asia", "South America", "Europe")
+# Clean column names
+names(uk_raw) <- names(uk_raw) %>%
+  tolower() %>%
+  str_replace_all("\\s+", "_")
 
-gdp_per_capita <- c(63544, 42330, 46259, 40494, 39286,
-                    8717, 2099, 6001, 2065, 9926,
-                    43242, 51812, 31489, 51615, 67294,
-                    3699, 9327, 3870, 10006, 15656)
+# 1) Drop by-elections
+uk1 <- uk_raw %>%
+  filter(!`election_is_by-election`)
 
-democracy_score <- c(7.9, 8.5, 8.7, 8.1, 8.0,
-                     6.9, 6.6, 7.1, 4.1, 6.1,
-                     9.2, 8.9, 8.0, 9.3, 9.8,
-                     3.4, 4.4, 6.3, 6.8, 7.0)
+# 2) Keep key variables and rename
+uk2 <- uk1 %>%
+  select(
+    constituency = constituency_name,
+    country      = country_name,
+    valid_votes  = candidate_vote_count,
+    electorate   = electorate
+  )
 
-population_millions <- c(331, 67, 83, 67, 126,
-                         213, 1380, 60, 211, 129,
-                         38, 26, 52, 10, 5,
-                         102, 84, 274, 45, 38)
+# 3) Aggregate from candidate-level to constituency-level
+uk3 <- uk2 %>%
+  group_by(country, constituency) %>%
+  summarise(
+    valid_votes = sum(valid_votes, na.rm = TRUE),
+    electorate  = max(electorate, na.rm = TRUE),
+    .groups = "drop"
+  )
 
-life_expectancy <- c(78.9, 81.3, 81.0, 82.5, 84.6,
-                     75.9, 69.7, 64.1, 54.7, 75.1,
-                     82.4, 83.4, 83.5, 82.8, 82.8,
-                     71.8, 77.7, 71.7, 76.5, 78.5)
+# 4) Compute turnout and drop bad rows
+uk <- uk3 %>%
+  mutate(turnout_registered = 100 * valid_votes / electorate) %>%
+  filter(is.finite(turnout_registered), electorate > 0)
 
-country_data <- data.frame(
-  country = countries,
-  region = regions,
-  gdp_per_capita = gdp_per_capita,
-  democracy_score = democracy_score,
-  population_millions = population_millions,
-  life_expectancy = life_expectancy,
-  stringsAsFactors = FALSE
-)
-
-head(country_data)
+glimpse(uk)
 ```
 
-The dataset contains `r nrow(country_data)` countries across multiple regions. Each row records the country name, region, GDP per capita (USD), democracy score, population in millions, and life expectancy in years.
+These four steps remove by-elections and keep only general election contests, select and rename the key columns, collapse multiple candidate rows per constituency into one row, and calculate turnout as a percentage of the electorate while removing any invalid rows.
 
-## Summary Statistics
+## Part 1: Are All Votes Equal?
 
-Before visualising the data, a brief summary of the key variables helps set context.
+### Smallest and Largest Constituencies
+
+The first question is whether constituency sizes vary enough to give some voters more influence than others. I identified the five smallest and five largest constituencies by valid votes cast.
+
+```{r smallest-largest}
+# 5 smallest constituencies by valid votes
+smallest <- uk %>%
+  arrange(valid_votes) %>%
+  slice_head(n = 5) %>%
+  select(constituency, country, valid_votes, turnout_registered)
+smallest
+
+# 5 largest constituencies by valid votes
+largest <- uk %>%
+  arrange(desc(valid_votes)) %>%
+  slice_head(n = 5) %>%
+  select(constituency, country, valid_votes, turnout_registered)
+largest
+
+# Ratio of largest to smallest
+biggest_value  <- max(uk$valid_votes, na.rm = TRUE)
+smallest_value <- min(uk$valid_votes, na.rm = TRUE)
+ratio <- biggest_value / smallest_value
+ratio
+```
+
+The ratio is a bit above four, meaning the largest constituency has roughly four times as many valid voters as the smallest. From a strict one-person-one-vote perspective, this is not fully fair — a vote in a small seat carries more weight per MP than in a much larger one.
+
+### Visualising Size Differences
+
+To see these differences more clearly, I first plotted histograms of constituency size by country, then improved the comparison with boxplots.
+
+```{r histogram, fig.width=10, fig.height=7}
+overall_mean <- mean(uk$valid_votes, na.rm = TRUE)
+
+ggplot(uk, aes(x = valid_votes)) +
+  geom_histogram(bins = 30, fill = "steelblue", alpha = 0.7) +
+  geom_vline(xintercept = overall_mean,
+             color = "red", linetype = "dashed", linewidth = 1) +
+  facet_wrap(~ country, ncol = 2) +
+  labs(
+    title = "Distribution of Constituency Sizes by Country",
+    subtitle = "Red dashed line = overall UK mean",
+    x = "Valid votes per constituency",
+    y = "Number of constituencies"
+  ) +
+  theme_minimal()
+```
+
+The histogram is hard to compare across countries because England has many more constituencies than the others, so its panel dominates visually. The boxplot below solves this problem.
+
+```{r boxplot, fig.width=9, fig.height=6}
+ggplot(uk, aes(x = country, y = valid_votes)) +
+  geom_boxplot(fill = "steelblue", alpha = 0.7, outlier.alpha = 0.6) +
+  labs(
+    title = "Constituency Size (Valid Votes) by Country",
+    subtitle = "Boxplots show median, spread, and outliers",
+    x = "Country",
+    y = "Valid votes"
+  ) +
+  theme_minimal()
+```
+
+The country with the narrowest box and shortest whiskers has the most equal constituency sizes, while the one with the widest box and more outliers has more inequality. Likely predictors of constituency size include population density (or an urban/rural indicator) and country or region, since boundary decisions differ across nations.
+
+### Summary Statistics by Country
 
 ```{r summary-stats}
-summary(country_data[, c("gdp_per_capita", "democracy_score", "life_expectancy")])
-```
-
-```{r region-summary}
-# Average democracy score and GDP per capita by region
-library(dplyr)
-
-region_summary <- country_data %>%
-  group_by(region) %>%
+size_summary <- uk %>%
+  group_by(country) %>%
   summarise(
-    n_countries = n(),
-    mean_gdp = round(mean(gdp_per_capita), 0),
-    mean_democracy = round(mean(democracy_score), 1),
-    mean_life_exp = round(mean(life_expectancy), 1)
+    mean_votes       = mean(valid_votes),
+    median_votes     = median(valid_votes),
+    sd_votes         = sd(valid_votes),
+    n_constituencies = n(),
+    .groups = "drop"
   ) %>%
-  arrange(desc(mean_democracy))
-
-region_summary
+  arrange(desc(mean_votes))
+size_summary
 ```
 
-The summary shows that European and North American countries in this sample tend to have higher average democracy scores and GDP per capita, while African countries have lower averages on both measures. These patterns motivate the visual analysis below.
+The median and standard deviation are the most useful statistics here. The median shows the typical seat size, while the standard deviation captures how much spread there is. Voters in very small constituencies have more voter power because each MP represents fewer people.
 
-## Visualisation: Democracy and Prosperity
+## Part 2: Who Isn't Voting?
 
-The figure below plots GDP per capita against democracy score for each country, with points sized by population and coloured by region. This visualisation is the piece of work I am most proud of from the course because it communicates a complex, multi-dimensional relationship in a single, readable figure.
+### Counting Non-Voters
 
-```{r main-visualisation, fig.width=10, fig.height=7}
-library(ggplot2)
+```{r non-voters}
+non_voter_analysis <- uk %>%
+  mutate(non_voters = electorate - valid_votes)
 
-ggplot(country_data, aes(x = democracy_score, y = gdp_per_capita)) +
-  geom_point(aes(size = population_millions, colour = region), alpha = 0.75) +
-  geom_smooth(method = "lm", se = TRUE, colour = "grey40", linetype = "dashed", linewidth = 0.8) +
-  geom_text(aes(label = country), size = 2.8, vjust = -1.0, check_overlap = TRUE) +
-  scale_y_continuous(labels = scales::comma_format(prefix = "$")) +
-  scale_size_continuous(range = c(3, 15), name = "Population (millions)") +
-  scale_colour_brewer(palette = "Set2", name = "Region") +
+total_non_voters     <- sum(non_voter_analysis$non_voters, na.rm = TRUE)
+total_electorate     <- sum(non_voter_analysis$electorate, na.rm = TRUE)
+non_voter_percentage <- 100 * total_non_voters / total_electorate
+
+total_non_voters
+non_voter_percentage
+
+top_non_voters <- non_voter_analysis %>%
+  arrange(desc(non_voters)) %>%
+  slice_head(n = 10) %>%
+  select(constituency, country, electorate, valid_votes,
+         non_voters, turnout_registered)
+top_non_voters
+```
+
+Large numbers of non-voters are concentrated in big constituencies with lower turnout, often in urban areas. This matters because those people are absent from the final result even though they are formally part of the electorate.
+
+### Turnout Categories
+
+I grouped constituencies into turnout bands to see patterns across the four nations.
+
+```{r turnout-categories, fig.width=10, fig.height=6}
+turnout_categories <- uk %>%
+  mutate(
+    category = case_when(
+      turnout_registered < 55 ~ "Low",
+      turnout_registered < 65 ~ "Medium",
+      turnout_registered < 75 ~ "High",
+      TRUE ~ "Very High"
+    ),
+    category = factor(category,
+                      levels = c("Low", "Medium", "High", "Very High"))
+  )
+
+category_counts <- turnout_categories %>%
+  group_by(category, country) %>%
+  summarise(count = n(), .groups = "drop")
+
+ggplot(category_counts, aes(x = category, y = count, fill = country)) +
+  geom_col(position = "dodge") +
+  scale_fill_brewer(palette = "Set2") +
   labs(
-    title = "Democracy Score vs GDP per Capita",
-    subtitle = "Point size reflects population; dashed line shows linear trend",
-    x = "Democracy Score (0-10)",
-    y = "GDP per Capita (USD)",
-    caption = "Data: Illustrative country-level dataset for GV300"
+    title = "Constituencies by Turnout Category and Country",
+    subtitle = "Turnout categories across UK countries",
+    x = "Turnout category",
+    y = "Number of constituencies",
+    fill = "Country"
   ) +
-  theme_minimal(base_size = 13) +
+  theme_minimal() +
   theme(
-    plot.title = element_text(face = "bold", size = 16),
-    plot.subtitle = element_text(colour = "grey40"),
-    legend.position = "bottom",
-    legend.box = "vertical"
+    plot.title = element_text(face = "bold", size = 14),
+    legend.position = "bottom"
   )
 ```
 
-### What the figure shows
+The high turnout band is most common, followed by medium. There are clear country differences in how many low and high seats each nation has. The categories are simple but somewhat arbitrary because they use fixed cut-offs; quantile-based bands could also be used, but these still clearly show low, average, and very high turnout seats.
 
-The scatter plot reveals a positive association between democracy score and GDP per capita across the 20 countries in this sample. Countries with higher democracy scores --- such as Norway, Sweden, and Canada --- tend to also have higher GDP per capita, while countries with lower democracy scores --- such as Nigeria and Egypt --- tend to have lower GDP per capita. The dashed trend line confirms this upward relationship, though there is considerable spread around it, which suggests that democracy alone does not determine economic output.
+### High vs Low Turnout Comparison
 
-Point size encodes population, making it easy to see that large countries like India and Indonesia have moderate democracy scores but relatively low GDP per capita, while smaller wealthy democracies cluster in the upper right. The colour coding by region highlights geographic patterns: European countries are clustered toward the upper right, while African countries fall toward the lower left. These patterns are consistent with well-known findings in comparative politics about the relationship between regime type and economic development, though the direction of causality remains debated in the literature.
+```{r high-low-turnout}
+high_turnout <- uk %>% filter(turnout_registered > 70)
+low_turnout  <- uk %>% filter(turnout_registered < 60)
 
-## Correlation Analysis
+high_summary <- high_turnout %>%
+  group_by(country) %>%
+  summarise(
+    n_constituencies = n(),
+    mean_electorate  = mean(electorate),
+    mean_turnout     = mean(turnout_registered),
+    .groups = "drop"
+  )
 
-To support the visual impression, a simple correlation test quantifies the linear relationship.
+low_summary <- low_turnout %>%
+  group_by(country) %>%
+  summarise(
+    n_constituencies = n(),
+    mean_electorate  = mean(electorate),
+    mean_turnout     = mean(turnout_registered),
+    .groups = "drop"
+  )
 
-```{r correlation}
-cor_test <- cor.test(country_data$democracy_score, country_data$gdp_per_capita)
-cor_test
+comparison <- bind_rows(
+  high_summary %>% mutate(group = "High Turnout (>70%)"),
+  low_summary  %>% mutate(group = "Low Turnout (<60%)")
+) %>%
+  select(group, country, n_constituencies, mean_electorate, mean_turnout)
+comparison
 ```
 
-The Pearson correlation coefficient is `r round(cor_test$estimate, 3)`, which indicates a strong positive linear association. The p-value is well below 0.05, suggesting the relationship is statistically significant in this sample. However, with only 20 observations, these results should be interpreted cautiously and are intended here as a demonstration of method rather than a definitive finding.
+High-turnout seats generally have somewhat different electorate sizes and country mix compared to low-turnout seats. Low-turnout places are often more urban and more deprived, with weaker engagement and trust. High-turnout places tend to be more politically engaged and sometimes more competitive. These structural differences help explain the turnout gap between areas.
 
 ## Conclusion
 
-This showcase demonstrates the workflow I developed during GV300: assembling data, computing summary statistics, producing a multi-layered visualisation, and interpreting the results in the context of political science. The tools used --- R, dplyr, and ggplot2 --- allowed me to move from raw data to a polished, informative figure in a reproducible pipeline.
+This assignment showed that UK constituencies vary considerably in size and turnout, raising questions about the equality of representation under first-past-the-post. The combination of tidyverse data wrangling and ggplot2 visualisation made it possible to move from raw parliamentary data to clear, interpretable findings in a reproducible workflow.
 
 The source code for this site is available on [GitHub](https://github.com/bandarj300/.github.io).

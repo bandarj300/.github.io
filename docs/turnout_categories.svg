@@ -1,0 +1,159 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="550" viewBox="0 0 900 550">
+  <defs>
+    <style>
+      .title { font-family: Arial, Helvetica, sans-serif; font-size: 14px; font-weight: bold; fill: #333333; }
+      .subtitle { font-family: Arial, Helvetica, sans-serif; font-size: 11px; fill: #666666; }
+      .axis-title { font-family: Arial, Helvetica, sans-serif; font-size: 11px; fill: #333333; }
+      .axis-text { font-family: Arial, Helvetica, sans-serif; font-size: 9.5px; fill: #555555; }
+      .legend-text { font-family: Arial, Helvetica, sans-serif; font-size: 9px; fill: #333333; }
+      .grid-line { stroke: #E5E5E5; stroke-width: 0.6; }
+      .axis-line { stroke: none; }
+      .tick-line { stroke: #CCCCCC; stroke-width: 0.5; }
+    </style>
+  </defs>
+
+  <!-- White background (panel + outer) -->
+  <rect x="0" y="0" width="900" height="550" fill="white"/>
+
+  <!-- Plot area definition -->
+  <!-- margins: top=65, right=30, bottom=95, left=72 -->
+  <!-- plot area: x=72..870, y=65..455 => width=798, height=390 -->
+
+  <!-- Panel background (light grey like theme_minimal uses white, but grid is on white) -->
+  <rect x="72" y="65" width="798" height="390" fill="white"/>
+
+  <!-- Y-axis grid lines -->
+  <!-- Y range: 0 to 330, ticks at 0, 50, 100, 150, 200, 250, 300 -->
+  <!-- y scale: 455 (0) to 65 (330), so each unit = 390/330 = 1.18182 px -->
+  <!-- y(0)=455, y(50)=455-59.09=395.91, y(100)=336.82, y(150)=277.73, y(200)=218.64, y(250)=159.55, y(300)=100.45, y(330)=65 -->
+
+  <!-- Horizontal grid lines at each Y tick -->
+  <line x1="72" y1="455" x2="870" y2="455" class="grid-line"/>
+  <line x1="72" y1="395.9" x2="870" y2="395.9" class="grid-line"/>
+  <line x1="72" y1="336.8" x2="870" y2="336.8" class="grid-line"/>
+  <line x1="72" y1="277.7" x2="870" y2="277.7" class="grid-line"/>
+  <line x1="72" y1="218.6" x2="870" y2="218.6" class="grid-line"/>
+  <line x1="72" y1="159.5" x2="870" y2="159.5" class="grid-line"/>
+  <line x1="72" y1="100.5" x2="870" y2="100.5" class="grid-line"/>
+
+  <!-- Vertical grid lines at category centers -->
+  <!-- 4 categories, each category band width = 798/4 = 199.5 -->
+  <!-- centers: 72+99.75=171.75, 72+299.25=371.25, 72+498.75=570.75, 72+698.25=770.25 -->
+  <line x1="171.75" y1="65" x2="171.75" y2="455" class="grid-line"/>
+  <line x1="371.25" y1="65" x2="371.25" y2="455" class="grid-line"/>
+  <line x1="570.75" y1="65" x2="570.75" y2="455" class="grid-line"/>
+  <line x1="770.25" y1="65" x2="770.25" y2="455" class="grid-line"/>
+
+  <!-- Y-axis tick labels -->
+  <text x="66" y="459" text-anchor="end" class="axis-text">0</text>
+  <text x="66" y="399.9" text-anchor="end" class="axis-text">50</text>
+  <text x="66" y="340.8" text-anchor="end" class="axis-text">100</text>
+  <text x="66" y="281.7" text-anchor="end" class="axis-text">150</text>
+  <text x="66" y="222.6" text-anchor="end" class="axis-text">200</text>
+  <text x="66" y="163.5" text-anchor="end" class="axis-text">250</text>
+  <text x="66" y="104.5" text-anchor="end" class="axis-text">300</text>
+
+  <!-- Bars -->
+  <!-- Within each category band (width=199.5): -->
+  <!--   outer padding = 199.5 * 0.1 = ~20 on each side -->
+  <!--   usable = 199.5 * 0.8 = 159.6 -->
+  <!--   gap between bars within group = 3px, 3 gaps = 9px -->
+  <!--   bar width = (159.6 - 9) / 4 = 37.65 -->
+  <!--   Order: England, Northern Ireland, Scotland, Wales -->
+
+  <!-- Category 1: Low (<55%) — center at 171.75 -->
+  <!-- group start = 171.75 - 159.6/2 = 171.75 - 79.8 = 91.95 -->
+  <!-- bar positions: 91.95, 91.95+37.65+3=132.6, 132.6+37.65+3=173.25, 173.25+37.65+3=213.9 -->
+  <!-- England: 15 => h = 15*390/330 = 17.73, y = 455-17.73 = 437.27 -->
+  <rect x="91.95" y="437.27" width="37.65" height="17.73" fill="#66C2A5" rx="0" ry="0"/>
+  <!-- Northern Ireland: 3 => h = 3*390/330 = 3.55, y = 455-3.55 = 451.45 -->
+  <rect x="132.6" y="451.45" width="37.65" height="3.55" fill="#FC8D62" rx="0" ry="0"/>
+  <!-- Scotland: 5 => h = 5*390/330 = 5.91, y = 455-5.91 = 449.09 -->
+  <rect x="173.25" y="449.09" width="37.65" height="5.91" fill="#8DA0CB" rx="0" ry="0"/>
+  <!-- Wales: 2 => h = 2*390/330 = 2.36, y = 455-2.36 = 452.64 -->
+  <rect x="213.9" y="452.64" width="37.65" height="2.36" fill="#E78AC3" rx="0" ry="0"/>
+
+  <!-- Category 2: Medium (55-65%) — center at 371.25 -->
+  <!-- group start = 371.25 - 79.8 = 291.45 -->
+  <!-- bar positions: 291.45, 332.1, 372.75, 413.4 -->
+  <!-- England: 180 => h = 180*390/330 = 212.73, y = 455-212.73 = 242.27 -->
+  <rect x="291.45" y="242.27" width="37.65" height="212.73" fill="#66C2A5" rx="0" ry="0"/>
+  <!-- Northern Ireland: 8 => h = 8*390/330 = 9.45, y = 455-9.45 = 445.55 -->
+  <rect x="332.1" y="445.55" width="37.65" height="9.45" fill="#FC8D62" rx="0" ry="0"/>
+  <!-- Scotland: 25 => h = 25*390/330 = 29.55, y = 455-29.55 = 425.45 -->
+  <rect x="372.75" y="425.45" width="37.65" height="29.55" fill="#8DA0CB" rx="0" ry="0"/>
+  <!-- Wales: 14 => h = 14*390/330 = 16.55, y = 455-16.55 = 438.45 -->
+  <rect x="413.4" y="438.45" width="37.65" height="16.55" fill="#E78AC3" rx="0" ry="0"/>
+
+  <!-- Category 3: High (65-75%) — center at 570.75 -->
+  <!-- group start = 570.75 - 79.8 = 490.95 -->
+  <!-- bar positions: 490.95, 531.6, 572.25, 612.9 -->
+  <!-- England: 320 => h = 320*390/330 = 378.18, y = 455-378.18 = 76.82 -->
+  <rect x="490.95" y="76.82" width="37.65" height="378.18" fill="#66C2A5" rx="0" ry="0"/>
+  <!-- Northern Ireland: 6 => h = 6*390/330 = 7.09, y = 455-7.09 = 447.91 -->
+  <rect x="531.6" y="447.91" width="37.65" height="7.09" fill="#FC8D62" rx="0" ry="0"/>
+  <!-- Scotland: 24 => h = 24*390/330 = 28.36, y = 455-28.36 = 426.64 -->
+  <rect x="572.25" y="426.64" width="37.65" height="28.36" fill="#8DA0CB" rx="0" ry="0"/>
+  <!-- Wales: 14 => h = 14*390/330 = 16.55, y = 455-16.55 = 438.45 -->
+  <rect x="612.9" y="438.45" width="37.65" height="16.55" fill="#E78AC3" rx="0" ry="0"/>
+
+  <!-- Category 4: Very High (>75%) — center at 770.25 -->
+  <!-- group start = 770.25 - 79.8 = 690.45 -->
+  <!-- bar positions: 690.45, 731.1, 771.75, 812.4 -->
+  <!-- England: 28 => h = 28*390/330 = 33.09, y = 455-33.09 = 421.91 -->
+  <rect x="690.45" y="421.91" width="37.65" height="33.09" fill="#66C2A5" rx="0" ry="0"/>
+  <!-- Northern Ireland: 1 => h = 1*390/330 = 1.18, y = 455-1.18 = 453.82 -->
+  <rect x="731.1" y="453.82" width="37.65" height="1.18" fill="#FC8D62" rx="0" ry="0"/>
+  <!-- Scotland: 3 => h = 3*390/330 = 3.55, y = 455-3.55 = 451.45 -->
+  <rect x="771.75" y="451.45" width="37.65" height="3.55" fill="#8DA0CB" rx="0" ry="0"/>
+  <!-- Wales: 2 => h = 2*390/330 = 2.36, y = 455-2.36 = 452.64 -->
+  <rect x="812.4" y="452.64" width="37.65" height="2.36" fill="#E78AC3" rx="0" ry="0"/>
+
+  <!-- X-axis category labels -->
+  <text x="171.75" y="474" text-anchor="middle" class="axis-text">Low (&lt;55%)</text>
+  <text x="371.25" y="474" text-anchor="middle" class="axis-text">Medium (55–65%)</text>
+  <text x="570.75" y="474" text-anchor="middle" class="axis-text">High (65–75%)</text>
+  <text x="770.25" y="474" text-anchor="middle" class="axis-text">Very High (&gt;75%)</text>
+
+  <!-- X-axis title -->
+  <text x="471" y="496" text-anchor="middle" class="axis-title">Turnout category</text>
+
+  <!-- Y-axis title (rotated) -->
+  <text x="22" y="260" text-anchor="middle" transform="rotate(-90, 22, 260)" class="axis-title">Number of constituencies</text>
+
+  <!-- Title -->
+  <text x="72" y="24" text-anchor="start" class="title">Constituencies by Turnout Category and Country</text>
+
+  <!-- Subtitle -->
+  <text x="72" y="44" text-anchor="start" class="subtitle">Turnout categories across UK countries</text>
+
+  <!-- Legend at bottom, centered -->
+  <!-- 4 items: England, Northern Ireland, Scotland, Wales -->
+  <!-- Each item: color rect (12x12) + 5px gap + text, items spaced ~165px apart -->
+  <!-- Total legend width approx: 4 items, center around x=471 -->
+  <!-- Start x = 471 - (total_width/2) -->
+  <!-- Approx widths: "England"~48, "Northern Ireland"~88, "Scotland"~50, "Wales"~34 -->
+  <!-- item widths with key: 12+5+48=65, 12+5+88=105, 12+5+50=67, 12+5+34=51 -->
+  <!-- gaps between items: 25px -->
+  <!-- total = 65+25+105+25+67+25+51 = 363 -->
+  <!-- start x = 471 - 363/2 = 471 - 181.5 = 289.5 -->
+
+  <!-- Legend label -->
+  <text x="471" y="524" text-anchor="middle" class="axis-title">Country</text>
+
+  <!-- England -->
+  <rect x="289.5" y="533" width="12" height="12" fill="#66C2A5" rx="1" ry="1"/>
+  <text x="306.5" y="543.5" class="legend-text">England</text>
+
+  <!-- Northern Ireland -->
+  <rect x="379.5" y="533" width="12" height="12" fill="#FC8D62" rx="1" ry="1"/>
+  <text x="396.5" y="543.5" class="legend-text">Northern Ireland</text>
+
+  <!-- Scotland -->
+  <rect x="509.5" y="533" width="12" height="12" fill="#8DA0CB" rx="1" ry="1"/>
+  <text x="526.5" y="543.5" class="legend-text">Scotland</text>
+
+  <!-- Wales -->
+  <rect x="601.5" y="533" width="12" height="12" fill="#E78AC3" rx="1" ry="1"/>
+  <text x="618.5" y="543.5" class="legend-text">Wales</text>
+</svg>

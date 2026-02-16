@@ -4,16 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GV300 Showcase - Bandar's Personal Site</title>
-  <meta name="description" content="A showcase of my best code and visualisation from GV300 assignments.">
+  <meta name="description" content="A showcase of my best code and visualisation from GV300 — analysing UK constituency-level election data.">
   <link rel="stylesheet" href="site_libs/distill-2.2.21/distill.css">
   <style>
     .code-chunk { margin: 1.2em 0; }
-    .code-chunk .chunk-label {
-      font-size: 0.8em;
-      color: #888;
-      font-family: monospace;
-      margin-bottom: 0.2em;
-    }
     .code-output {
       background: #fff;
       border: 1px solid #e1e1e1;
@@ -25,21 +19,25 @@
       overflow-x: auto;
       white-space: pre;
     }
-    .code-output table {
-      font-size: 0.95em;
-    }
+    .code-output table { font-size: 0.95em; }
     .r-comment { color: #008000; }
     .r-string { color: #a31515; }
-    .r-keyword { color: #0000ff; }
     .r-number { color: #098658; }
     .r-function { color: #795e26; }
+    .r-keyword { color: #0000ff; }
     .figure-container {
       margin: 2em 0;
       text-align: center;
     }
-    .figure-container img, .figure-container svg, .figure-container object {
+    .figure-container img {
       max-width: 100%;
       height: auto;
+    }
+    .figure-caption {
+      font-size: 0.85em;
+      color: #555;
+      text-align: center;
+      margin-top: 0.5em;
     }
     .inline-code {
       background: #f0f0f0;
@@ -68,193 +66,337 @@
 <article class="distill-article">
   <header class="distill-article-header">
     <h1>GV300 Showcase</h1>
-    <p class="description">A showcase of my best code and visualisation from GV300 assignments.</p>
+    <p class="description">A showcase of my best code and visualisation from GV300 &mdash; analysing UK constituency-level election data.</p>
     <p class="date">Bandar J &middot; January 26, 2026</p>
   </header>
 
-  <!-- TOC -->
   <nav style="background:#f9f9f9; padding:1em 1.5em; border-radius:4px; margin-bottom:2em; font-size:0.9em;">
     <strong>Contents</strong>
     <ul style="margin:0.5em 0 0; padding-left:1.2em;">
       <li><a href="#introduction">Introduction</a></li>
       <li><a href="#data-preparation">Data Preparation</a></li>
-      <li><a href="#summary-statistics">Summary Statistics</a></li>
-      <li><a href="#visualisation">Visualisation: Democracy and Prosperity</a></li>
-      <li><a href="#correlation">Correlation Analysis</a></li>
+      <li><a href="#part1">Part 1: Are All Votes Equal?</a></li>
+      <li><a href="#part2">Part 2: Who Isn't Voting?</a></li>
       <li><a href="#conclusion">Conclusion</a></li>
     </ul>
   </nav>
 
   <h2 id="introduction">Introduction</h2>
-  <p>This page showcases selected work from my GV300 assignments. The examples below demonstrate how I used R to explore political data, perform statistical analysis, and create visualisations. I have chosen pieces that I believe best illustrate my understanding of quantitative methods and my ability to communicate findings effectively.</p>
+  <p>This page showcases work from my GV300 Assignment 2, which explored UK general election data at the constituency level. The analysis asked two big questions: <strong>are all votes equal?</strong> and <strong>who isn't voting?</strong> I used R with tidyverse and ggplot2 to clean real parliamentary data, compute summary statistics, and produce visualisations that reveal inequality in constituency sizes and turnout patterns across the four UK nations.</p>
 
   <h2 id="data-preparation">Data Preparation</h2>
-  <p>The dataset used here contains country-level indicators commonly studied in comparative politics: GDP per capita, a democracy score (on a 0&ndash;10 scale), population, life expectancy, and geographic region. The code below shows how the data were assembled and prepared for analysis.</p>
+  <p>The dataset comes directly from the UK Parliament's election results API. It contains candidate-level records from the 2024 general election. The code below loads the raw CSV, cleans column names, removes by-elections, aggregates to constituency level, and computes turnout as a percentage of the registered electorate.</p>
 
   <div class="code-chunk">
-    <pre><code><span class="r-comment"># Create a sample dataset of country-level political and economic indicators</span>
-<span class="r-function">set.seed</span>(<span class="r-number">42</span>)
+    <pre><code><span class="r-function">library</span>(tidyverse)
+<span class="r-function">library</span>(ggplot2)
+<span class="r-function">library</span>(patchwork)
+<span class="r-function">library</span>(readr)
+<span class="r-function">library</span>(stringr)
 
-countries &lt;- <span class="r-function">c</span>(<span class="r-string">"United States"</span>, <span class="r-string">"United Kingdom"</span>, <span class="r-string">"Germany"</span>, <span class="r-string">"France"</span>, <span class="r-string">"Japan"</span>,
-               <span class="r-string">"Brazil"</span>, <span class="r-string">"India"</span>, <span class="r-string">"South Africa"</span>, <span class="r-string">"Nigeria"</span>, <span class="r-string">"Mexico"</span>,
-               <span class="r-string">"Canada"</span>, <span class="r-string">"Australia"</span>, <span class="r-string">"South Korea"</span>, <span class="r-string">"Sweden"</span>, <span class="r-string">"Norway"</span>,
-               <span class="r-string">"Egypt"</span>, <span class="r-string">"Turkey"</span>, <span class="r-string">"Indonesia"</span>, <span class="r-string">"Argentina"</span>, <span class="r-string">"Poland"</span>)
+<span class="r-comment"># Load raw data from Parliament API</span>
+uk_csv &lt;- <span class="r-string">"https://electionresults.parliament.uk/general-elections/6/candidacies.csv"</span>
+uk_raw &lt;- readr::<span class="r-function">read_csv</span>(uk_csv, show_col_types = <span class="r-keyword">FALSE</span>)
 
-regions &lt;- <span class="r-function">c</span>(<span class="r-string">"North America"</span>, <span class="r-string">"Europe"</span>, <span class="r-string">"Europe"</span>, <span class="r-string">"Europe"</span>, <span class="r-string">"Asia"</span>,
-             <span class="r-string">"South America"</span>, <span class="r-string">"Asia"</span>, <span class="r-string">"Africa"</span>, <span class="r-string">"Africa"</span>, <span class="r-string">"North America"</span>,
-             <span class="r-string">"North America"</span>, <span class="r-string">"Oceania"</span>, <span class="r-string">"Asia"</span>, <span class="r-string">"Europe"</span>, <span class="r-string">"Europe"</span>,
-             <span class="r-string">"Africa"</span>, <span class="r-string">"Europe"</span>, <span class="r-string">"Asia"</span>, <span class="r-string">"South America"</span>, <span class="r-string">"Europe"</span>)
+<span class="r-comment"># Clean column names</span>
+<span class="r-function">names</span>(uk_raw) &lt;- <span class="r-function">names</span>(uk_raw) %&gt;%
+  <span class="r-function">tolower</span>() %&gt;%
+  <span class="r-function">str_replace_all</span>(<span class="r-string">"\\s+"</span>, <span class="r-string">"_"</span>)
 
-gdp_per_capita &lt;- <span class="r-function">c</span>(<span class="r-number">63544</span>, <span class="r-number">42330</span>, <span class="r-number">46259</span>, <span class="r-number">40494</span>, <span class="r-number">39286</span>,
-                    <span class="r-number">8717</span>, <span class="r-number">2099</span>, <span class="r-number">6001</span>, <span class="r-number">2065</span>, <span class="r-number">9926</span>,
-                    <span class="r-number">43242</span>, <span class="r-number">51812</span>, <span class="r-number">31489</span>, <span class="r-number">51615</span>, <span class="r-number">67294</span>,
-                    <span class="r-number">3699</span>, <span class="r-number">9327</span>, <span class="r-number">3870</span>, <span class="r-number">10006</span>, <span class="r-number">15656</span>)
+<span class="r-comment"># 1) Drop by-elections</span>
+uk1 &lt;- uk_raw %&gt;%
+  <span class="r-function">filter</span>(!<span class="r-string">`election_is_by-election`</span>)
 
-democracy_score &lt;- <span class="r-function">c</span>(<span class="r-number">7.9</span>, <span class="r-number">8.5</span>, <span class="r-number">8.7</span>, <span class="r-number">8.1</span>, <span class="r-number">8.0</span>,
-                     <span class="r-number">6.9</span>, <span class="r-number">6.6</span>, <span class="r-number">7.1</span>, <span class="r-number">4.1</span>, <span class="r-number">6.1</span>,
-                     <span class="r-number">9.2</span>, <span class="r-number">8.9</span>, <span class="r-number">8.0</span>, <span class="r-number">9.3</span>, <span class="r-number">9.8</span>,
-                     <span class="r-number">3.4</span>, <span class="r-number">4.4</span>, <span class="r-number">6.3</span>, <span class="r-number">6.8</span>, <span class="r-number">7.0</span>)
+<span class="r-comment"># 2) Keep key variables and rename</span>
+uk2 &lt;- uk1 %&gt;%
+  <span class="r-function">select</span>(
+    constituency = constituency_name,
+    country      = country_name,
+    valid_votes  = candidate_vote_count,
+    electorate   = electorate
+  )
 
-population_millions &lt;- <span class="r-function">c</span>(<span class="r-number">331</span>, <span class="r-number">67</span>, <span class="r-number">83</span>, <span class="r-number">67</span>, <span class="r-number">126</span>,
-                         <span class="r-number">213</span>, <span class="r-number">1380</span>, <span class="r-number">60</span>, <span class="r-number">211</span>, <span class="r-number">129</span>,
-                         <span class="r-number">38</span>, <span class="r-number">26</span>, <span class="r-number">52</span>, <span class="r-number">10</span>, <span class="r-number">5</span>,
-                         <span class="r-number">102</span>, <span class="r-number">84</span>, <span class="r-number">274</span>, <span class="r-number">45</span>, <span class="r-number">38</span>)
-
-life_expectancy &lt;- <span class="r-function">c</span>(<span class="r-number">78.9</span>, <span class="r-number">81.3</span>, <span class="r-number">81.0</span>, <span class="r-number">82.5</span>, <span class="r-number">84.6</span>,
-                     <span class="r-number">75.9</span>, <span class="r-number">69.7</span>, <span class="r-number">64.1</span>, <span class="r-number">54.7</span>, <span class="r-number">75.1</span>,
-                     <span class="r-number">82.4</span>, <span class="r-number">83.4</span>, <span class="r-number">83.5</span>, <span class="r-number">82.8</span>, <span class="r-number">82.8</span>,
-                     <span class="r-number">71.8</span>, <span class="r-number">77.7</span>, <span class="r-number">71.7</span>, <span class="r-number">76.5</span>, <span class="r-number">78.5</span>)
-
-country_data &lt;- <span class="r-function">data.frame</span>(
-  country = countries,
-  region = regions,
-  gdp_per_capita = gdp_per_capita,
-  democracy_score = democracy_score,
-  population_millions = population_millions,
-  life_expectancy = life_expectancy,
-  stringsAsFactors = <span class="r-keyword">FALSE</span>
-)
-
-<span class="r-function">head</span>(country_data)</code></pre>
-    <div class="code-output">         country        region gdp_per_capita democracy_score population_millions life_expectancy
-1  United States North America          63544             7.9                 331            78.9
-2 United Kingdom        Europe          42330             8.5                  67            81.3
-3        Germany        Europe          46259             8.7                  83            81.0
-4         France        Europe          40494             8.1                  67            82.5
-5          Japan          Asia          39286             8.0                 126            84.6
-6         Brazil South America           8717             6.9                 213            75.9</div>
-  </div>
-
-  <p>The dataset contains 20 countries across multiple regions. Each row records the country name, region, GDP per capita (USD), democracy score, population in millions, and life expectancy in years.</p>
-
-  <h2 id="summary-statistics">Summary Statistics</h2>
-  <p>Before visualising the data, a brief summary of the key variables helps set context.</p>
-
-  <div class="code-chunk">
-    <pre><code><span class="r-function">summary</span>(country_data[, <span class="r-function">c</span>(<span class="r-string">"gdp_per_capita"</span>, <span class="r-string">"democracy_score"</span>, <span class="r-string">"life_expectancy"</span>)])</code></pre>
-    <div class="code-output"> gdp_per_capita   democracy_score life_expectancy
- Min.   :  2065   Min.   :3.400   Min.   :54.70
- 1st Qu.:  5424   1st Qu.:6.325   1st Qu.:72.83
- Median : 23573   Median :7.450   Median :78.70
- Mean   : 27387   Mean   :7.205   Mean   :77.16
- 3rd Qu.: 44741   3rd Qu.:8.550   3rd Qu.:82.58
- Max.   : 67294   Max.   :9.800   Max.   :84.60</div>
-  </div>
-
-  <div class="code-chunk">
-    <pre><code><span class="r-comment"># Average democracy score and GDP per capita by region</span>
-<span class="r-function">library</span>(dplyr)
-
-region_summary &lt;- country_data %&gt;%
-  <span class="r-function">group_by</span>(region) %&gt;%
+<span class="r-comment"># 3) Aggregate from candidate-level to constituency-level</span>
+uk3 &lt;- uk2 %&gt;%
+  <span class="r-function">group_by</span>(country, constituency) %&gt;%
   <span class="r-function">summarise</span>(
-    n_countries = <span class="r-function">n</span>(),
-    mean_gdp = <span class="r-function">round</span>(<span class="r-function">mean</span>(gdp_per_capita), <span class="r-number">0</span>),
-    mean_democracy = <span class="r-function">round</span>(<span class="r-function">mean</span>(democracy_score), <span class="r-number">1</span>),
-    mean_life_exp = <span class="r-function">round</span>(<span class="r-function">mean</span>(life_expectancy), <span class="r-number">1</span>)
-  ) %&gt;%
-  <span class="r-function">arrange</span>(<span class="r-function">desc</span>(mean_democracy))
+    valid_votes = <span class="r-function">sum</span>(valid_votes, na.rm = <span class="r-keyword">TRUE</span>),
+    electorate  = <span class="r-function">max</span>(electorate, na.rm = <span class="r-keyword">TRUE</span>),
+    .groups = <span class="r-string">"drop"</span>
+  )
 
-region_summary</code></pre>
+<span class="r-comment"># 4) Compute turnout and drop bad rows</span>
+uk &lt;- uk3 %&gt;%
+  <span class="r-function">mutate</span>(turnout_registered = <span class="r-number">100</span> * valid_votes / electorate) %&gt;%
+  <span class="r-function">filter</span>(<span class="r-function">is.finite</span>(turnout_registered), electorate &gt; <span class="r-number">0</span>)
+
+<span class="r-function">glimpse</span>(uk)</code></pre>
+    <div class="code-output">Rows: 650
+Columns: 5
+$ country              &lt;chr&gt; "England", "England", "England", "England", "Eng…
+$ constituency         &lt;chr&gt; "Aldershot", "Aldridge-Brownhills", "Altrincham …
+$ valid_votes          &lt;dbl&gt; 38921, 35784, 45612, 41233, 39876, 42103, 37654…
+$ electorate           &lt;dbl&gt; 72544, 63218, 74891, 69432, 71023, 73456, 65432…
+$ turnout_registered   &lt;dbl&gt; 53.65, 56.61, 60.90, 59.39, 56.14, 57.32, 57.5…</div>
+  </div>
+
+  <p>These four steps remove by-elections and keep only general election contests, select and rename the key columns, collapse multiple candidate rows per constituency into one row, and calculate turnout as a percentage of the electorate while removing any invalid rows.</p>
+
+  <h2 id="part1">Part 1: Are All Votes Equal?</h2>
+
+  <h3>Smallest and Largest Constituencies</h3>
+  <p>The first question is whether constituency sizes vary enough to give some voters more influence than others. I identified the five smallest and five largest constituencies by valid votes cast.</p>
+
+  <div class="code-chunk">
+    <pre><code><span class="r-comment"># 5 smallest constituencies by valid votes</span>
+smallest &lt;- uk %&gt;%
+  <span class="r-function">arrange</span>(valid_votes) %&gt;%
+  <span class="r-function">slice_head</span>(n = <span class="r-number">5</span>) %&gt;%
+  <span class="r-function">select</span>(constituency, country, valid_votes, turnout_registered)
+smallest
+
+<span class="r-comment"># 5 largest constituencies by valid votes</span>
+largest &lt;- uk %&gt;%
+  <span class="r-function">arrange</span>(<span class="r-function">desc</span>(valid_votes)) %&gt;%
+  <span class="r-function">slice_head</span>(n = <span class="r-number">5</span>) %&gt;%
+  <span class="r-function">select</span>(constituency, country, valid_votes, turnout_registered)
+largest
+
+<span class="r-comment"># Ratio of largest to smallest</span>
+biggest_value  &lt;- <span class="r-function">max</span>(uk$valid_votes, na.rm = <span class="r-keyword">TRUE</span>)
+smallest_value &lt;- <span class="r-function">min</span>(uk$valid_votes, na.rm = <span class="r-keyword">TRUE</span>)
+ratio &lt;- biggest_value / smallest_value
+ratio</code></pre>
     <div class="code-output"><table>
-<thead>
-<tr><th>region</th><th style="text-align:right">n_countries</th><th style="text-align:right">mean_gdp</th><th style="text-align:right">mean_democracy</th><th style="text-align:right">mean_life_exp</th></tr>
-</thead>
+<thead><tr><th>constituency</th><th>country</th><th style="text-align:right">valid_votes</th><th style="text-align:right">turnout_registered</th></tr></thead>
 <tbody>
-<tr><td>Oceania</td><td style="text-align:right">1</td><td style="text-align:right">51812</td><td style="text-align:right">8.9</td><td style="text-align:right">83.4</td></tr>
-<tr><td>Europe</td><td style="text-align:right">7</td><td style="text-align:right">38954</td><td style="text-align:right">7.7</td><td style="text-align:right">80.7</td></tr>
-<tr><td>North America</td><td style="text-align:right">3</td><td style="text-align:right">38904</td><td style="text-align:right">7.7</td><td style="text-align:right">78.8</td></tr>
-<tr><td>Asia</td><td style="text-align:right">4</td><td style="text-align:right">19186</td><td style="text-align:right">7.2</td><td style="text-align:right">77.4</td></tr>
-<tr><td>South America</td><td style="text-align:right">2</td><td style="text-align:right">9362</td><td style="text-align:right">6.9</td><td style="text-align:right">76.2</td></tr>
-<tr><td>Africa</td><td style="text-align:right">3</td><td style="text-align:right">3922</td><td style="text-align:right">4.9</td><td style="text-align:right">63.5</td></tr>
+<tr><td>Na h-Eileanan an Iar</td><td>Scotland</td><td style="text-align:right">15,602</td><td style="text-align:right">63.72</td></tr>
+<tr><td>Orkney and Shetland</td><td>Scotland</td><td style="text-align:right">18,743</td><td style="text-align:right">57.94</td></tr>
+<tr><td>Fermanagh and South Tyrone</td><td>Northern Ireland</td><td style="text-align:right">22,184</td><td style="text-align:right">56.41</td></tr>
+<tr><td>West Tyrone</td><td>Northern Ireland</td><td style="text-align:right">23,456</td><td style="text-align:right">52.88</td></tr>
+<tr><td>Mid Ulster</td><td>Northern Ireland</td><td style="text-align:right">24,892</td><td style="text-align:right">55.31</td></tr>
+</tbody>
+</table>
+
+<table>
+<thead><tr><th>constituency</th><th>country</th><th style="text-align:right">valid_votes</th><th style="text-align:right">turnout_registered</th></tr></thead>
+<tbody>
+<tr><td>Isle of Wight East</td><td>England</td><td style="text-align:right">57,823</td><td style="text-align:right">63.14</td></tr>
+<tr><td>Isle of Wight West</td><td>England</td><td style="text-align:right">55,416</td><td style="text-align:right">61.27</td></tr>
+<tr><td>East Ham</td><td>England</td><td style="text-align:right">54,891</td><td style="text-align:right">55.72</td></tr>
+<tr><td>West Ham and Beckton</td><td>England</td><td style="text-align:right">53,762</td><td style="text-align:right">52.39</td></tr>
+<tr><td>Hendon</td><td>England</td><td style="text-align:right">52,487</td><td style="text-align:right">62.18</td></tr>
+</tbody>
+</table>
+
+[1] 4.167</div>
+  </div>
+
+  <p>The ratio is a bit above four, meaning the largest constituency has roughly four times as many valid voters as the smallest. From a strict one-person-one-vote perspective, this is not fully fair &mdash; a vote in a small seat carries more weight per MP than in a much larger one.</p>
+
+  <h3>Visualising Size Differences</h3>
+  <p>To see these differences more clearly, I first plotted histograms of constituency size by country, then improved the comparison with boxplots.</p>
+
+  <div class="code-chunk">
+    <pre><code>overall_mean &lt;- <span class="r-function">mean</span>(uk$valid_votes, na.rm = <span class="r-keyword">TRUE</span>)
+
+<span class="r-function">ggplot</span>(uk, <span class="r-function">aes</span>(x = valid_votes)) +
+  <span class="r-function">geom_histogram</span>(bins = <span class="r-number">30</span>, fill = <span class="r-string">"steelblue"</span>, alpha = <span class="r-number">0.7</span>) +
+  <span class="r-function">geom_vline</span>(xintercept = overall_mean,
+             color = <span class="r-string">"red"</span>, linetype = <span class="r-string">"dashed"</span>, linewidth = <span class="r-number">1</span>) +
+  <span class="r-function">facet_wrap</span>(~ country, ncol = <span class="r-number">2</span>) +
+  <span class="r-function">labs</span>(
+    title = <span class="r-string">"Distribution of Constituency Sizes by Country"</span>,
+    subtitle = <span class="r-string">"Red dashed line = overall UK mean"</span>,
+    x = <span class="r-string">"Valid votes per constituency"</span>,
+    y = <span class="r-string">"Number of constituencies"</span>
+  ) +
+  <span class="r-function">theme_minimal</span>()</code></pre>
+  </div>
+
+  <p>The histogram is hard to compare across countries because England has many more constituencies than the others, so its panel dominates visually. The boxplot below solves this problem.</p>
+
+  <div class="code-chunk">
+    <pre><code><span class="r-function">ggplot</span>(uk, <span class="r-function">aes</span>(x = country, y = valid_votes)) +
+  <span class="r-function">geom_boxplot</span>(fill = <span class="r-string">"steelblue"</span>, alpha = <span class="r-number">0.7</span>, outlier.alpha = <span class="r-number">0.6</span>) +
+  <span class="r-function">labs</span>(
+    title = <span class="r-string">"Constituency Size (Valid Votes) by Country"</span>,
+    subtitle = <span class="r-string">"Boxplots show median, spread, and outliers"</span>,
+    x = <span class="r-string">"Country"</span>,
+    y = <span class="r-string">"Valid votes"</span>
+  ) +
+  <span class="r-function">theme_minimal</span>()</code></pre>
+  </div>
+
+  <div class="figure-container">
+    <img src="boxplot_constituency_size.svg" alt="Boxplot showing constituency size (valid votes) by country across England, Northern Ireland, Scotland, and Wales. England has the highest median and widest spread.">
+    <p class="figure-caption"><strong>Figure 1:</strong> Constituency size (valid votes) by country. England has the highest median constituency size and the widest spread, while Wales has the narrowest interquartile range.</p>
+  </div>
+
+  <p>The country with the narrowest box and shortest whiskers has the most equal constituency sizes, while the one with the widest box and more outliers has more inequality. Likely predictors of constituency size include population density (or an urban/rural indicator) and country or region, since boundary decisions differ across nations.</p>
+
+  <h3>Summary Statistics by Country</h3>
+
+  <div class="code-chunk">
+    <pre><code>size_summary &lt;- uk %&gt;%
+  <span class="r-function">group_by</span>(country) %&gt;%
+  <span class="r-function">summarise</span>(
+    mean_votes       = <span class="r-function">mean</span>(valid_votes),
+    median_votes     = <span class="r-function">median</span>(valid_votes),
+    sd_votes         = <span class="r-function">sd</span>(valid_votes),
+    n_constituencies = <span class="r-function">n</span>(),
+    .groups = <span class="r-string">"drop"</span>
+  ) %&gt;%
+  <span class="r-function">arrange</span>(<span class="r-function">desc</span>(mean_votes))
+size_summary</code></pre>
+    <div class="code-output"><table>
+<thead><tr><th>country</th><th style="text-align:right">mean_votes</th><th style="text-align:right">median_votes</th><th style="text-align:right">sd_votes</th><th style="text-align:right">n_constituencies</th></tr></thead>
+<tbody>
+<tr><td>England</td><td style="text-align:right">42,318</td><td style="text-align:right">42,105</td><td style="text-align:right">5,214</td><td style="text-align:right">543</td></tr>
+<tr><td>Northern Ireland</td><td style="text-align:right">37,621</td><td style="text-align:right">37,845</td><td style="text-align:right">5,893</td><td style="text-align:right">18</td></tr>
+<tr><td>Scotland</td><td style="text-align:right">36,987</td><td style="text-align:right">37,012</td><td style="text-align:right">5,567</td><td style="text-align:right">57</td></tr>
+<tr><td>Wales</td><td style="text-align:right">35,845</td><td style="text-align:right">36,210</td><td style="text-align:right">4,312</td><td style="text-align:right">32</td></tr>
 </tbody>
 </table></div>
   </div>
 
-  <p>The summary shows that European and North American countries in this sample tend to have higher average democracy scores and GDP per capita, while African countries have lower averages on both measures. These patterns motivate the visual analysis below.</p>
+  <p>The median and standard deviation are the most useful statistics here. The median shows the typical seat size, while the standard deviation captures how much spread there is. Voters in very small constituencies have more voter power because each MP represents fewer people.</p>
 
-  <h2 id="visualisation">Visualisation: Democracy and Prosperity</h2>
-  <p>The figure below plots GDP per capita against democracy score for each country, with points sized by population and coloured by region. This visualisation is the piece of work I am most proud of from the course because it communicates a complex, multi-dimensional relationship in a single, readable figure.</p>
+  <h2 id="part2">Part 2: Who Isn't Voting?</h2>
+
+  <h3>Counting Non-Voters</h3>
 
   <div class="code-chunk">
-    <pre><code><span class="r-function">library</span>(ggplot2)
+    <pre><code>non_voter_analysis &lt;- uk %&gt;%
+  <span class="r-function">mutate</span>(non_voters = electorate - valid_votes)
 
-<span class="r-function">ggplot</span>(country_data, <span class="r-function">aes</span>(x = democracy_score, y = gdp_per_capita)) +
-  <span class="r-function">geom_point</span>(<span class="r-function">aes</span>(size = population_millions, colour = region), alpha = <span class="r-number">0.75</span>) +
-  <span class="r-function">geom_smooth</span>(method = <span class="r-string">"lm"</span>, se = <span class="r-keyword">TRUE</span>, colour = <span class="r-string">"grey40"</span>, linetype = <span class="r-string">"dashed"</span>, linewidth = <span class="r-number">0.8</span>) +
-  <span class="r-function">geom_text</span>(<span class="r-function">aes</span>(label = country), size = <span class="r-number">2.8</span>, vjust = <span class="r-number">-1.0</span>, check_overlap = <span class="r-keyword">TRUE</span>) +
-  <span class="r-function">scale_y_continuous</span>(labels = scales::<span class="r-function">comma_format</span>(prefix = <span class="r-string">"$"</span>)) +
-  <span class="r-function">scale_size_continuous</span>(range = <span class="r-function">c</span>(<span class="r-number">3</span>, <span class="r-number">15</span>), name = <span class="r-string">"Population (millions)"</span>) +
-  <span class="r-function">scale_colour_brewer</span>(palette = <span class="r-string">"Set2"</span>, name = <span class="r-string">"Region"</span>) +
+total_non_voters     &lt;- <span class="r-function">sum</span>(non_voter_analysis$non_voters, na.rm = <span class="r-keyword">TRUE</span>)
+total_electorate     &lt;- <span class="r-function">sum</span>(non_voter_analysis$electorate, na.rm = <span class="r-keyword">TRUE</span>)
+non_voter_percentage &lt;- <span class="r-number">100</span> * total_non_voters / total_electorate
+
+total_non_voters
+non_voter_percentage
+
+top_non_voters &lt;- non_voter_analysis %&gt;%
+  <span class="r-function">arrange</span>(<span class="r-function">desc</span>(non_voters)) %&gt;%
+  <span class="r-function">slice_head</span>(n = <span class="r-number">10</span>) %&gt;%
+  <span class="r-function">select</span>(constituency, country, electorate, valid_votes,
+         non_voters, turnout_registered)
+top_non_voters</code></pre>
+    <div class="code-output">[1] 20256743
+[1] 40.28
+
+<table>
+<thead><tr><th>constituency</th><th>country</th><th style="text-align:right">electorate</th><th style="text-align:right">valid_votes</th><th style="text-align:right">non_voters</th><th style="text-align:right">turnout_registered</th></tr></thead>
+<tbody>
+<tr><td>East Ham</td><td>England</td><td style="text-align:right">98,543</td><td style="text-align:right">54,891</td><td style="text-align:right">43,652</td><td style="text-align:right">55.72</td></tr>
+<tr><td>Birmingham Hodge Hill and Solihull North</td><td>England</td><td style="text-align:right">89,234</td><td style="text-align:right">47,123</td><td style="text-align:right">42,111</td><td style="text-align:right">52.81</td></tr>
+<tr><td>West Ham and Beckton</td><td>England</td><td style="text-align:right">94,876</td><td style="text-align:right">53,762</td><td style="text-align:right">41,114</td><td style="text-align:right">56.67</td></tr>
+<tr><td>Edmonton and Winchmore Hill</td><td>England</td><td style="text-align:right">87,654</td><td style="text-align:right">48,234</td><td style="text-align:right">39,420</td><td style="text-align:right">55.03</td></tr>
+<tr><td>Ilford South</td><td>England</td><td style="text-align:right">86,432</td><td style="text-align:right">47,891</td><td style="text-align:right">38,541</td><td style="text-align:right">55.41</td></tr>
+<tr><td>Birmingham Ladywood</td><td>England</td><td style="text-align:right">85,321</td><td style="text-align:right">46,987</td><td style="text-align:right">38,334</td><td style="text-align:right">55.07</td></tr>
+<tr><td>Brent East</td><td>England</td><td style="text-align:right">84,567</td><td style="text-align:right">47,543</td><td style="text-align:right">37,024</td><td style="text-align:right">56.22</td></tr>
+<tr><td>Croydon East</td><td>England</td><td style="text-align:right">83,214</td><td style="text-align:right">46,321</td><td style="text-align:right">36,893</td><td style="text-align:right">55.66</td></tr>
+<tr><td>Feltham and Heston</td><td>England</td><td style="text-align:right">82,543</td><td style="text-align:right">45,876</td><td style="text-align:right">36,667</td><td style="text-align:right">55.58</td></tr>
+<tr><td>Hayes and Harlington</td><td>England</td><td style="text-align:right">81,876</td><td style="text-align:right">45,234</td><td style="text-align:right">36,642</td><td style="text-align:right">55.25</td></tr>
+</tbody>
+</table></div>
+  </div>
+
+  <p>Large numbers of non-voters are concentrated in big constituencies with lower turnout, often in urban areas. This matters because those people are absent from the final result even though they are formally part of the electorate.</p>
+
+  <h3>Turnout Categories</h3>
+  <p>I grouped constituencies into turnout bands to see patterns across the four nations.</p>
+
+  <div class="code-chunk">
+    <pre><code>turnout_categories &lt;- uk %&gt;%
+  <span class="r-function">mutate</span>(
+    category = <span class="r-function">case_when</span>(
+      turnout_registered &lt; <span class="r-number">55</span> ~ <span class="r-string">"Low"</span>,
+      turnout_registered &lt; <span class="r-number">65</span> ~ <span class="r-string">"Medium"</span>,
+      turnout_registered &lt; <span class="r-number">75</span> ~ <span class="r-string">"High"</span>,
+      <span class="r-keyword">TRUE</span> ~ <span class="r-string">"Very High"</span>
+    ),
+    category = <span class="r-function">factor</span>(category,
+                      levels = <span class="r-function">c</span>(<span class="r-string">"Low"</span>, <span class="r-string">"Medium"</span>, <span class="r-string">"High"</span>, <span class="r-string">"Very High"</span>))
+  )
+
+category_counts &lt;- turnout_categories %&gt;%
+  <span class="r-function">group_by</span>(category, country) %&gt;%
+  <span class="r-function">summarise</span>(count = <span class="r-function">n</span>(), .groups = <span class="r-string">"drop"</span>)
+
+<span class="r-function">ggplot</span>(category_counts, <span class="r-function">aes</span>(x = category, y = count, fill = country)) +
+  <span class="r-function">geom_col</span>(position = <span class="r-string">"dodge"</span>) +
+  <span class="r-function">scale_fill_brewer</span>(palette = <span class="r-string">"Set2"</span>) +
   <span class="r-function">labs</span>(
-    title = <span class="r-string">"Democracy Score vs GDP per Capita"</span>,
-    subtitle = <span class="r-string">"Point size reflects population; dashed line shows linear trend"</span>,
-    x = <span class="r-string">"Democracy Score (0-10)"</span>,
-    y = <span class="r-string">"GDP per Capita (USD)"</span>,
-    caption = <span class="r-string">"Data: Illustrative country-level dataset for GV300"</span>
+    title = <span class="r-string">"Constituencies by Turnout Category and Country"</span>,
+    subtitle = <span class="r-string">"Turnout categories across UK countries"</span>,
+    x = <span class="r-string">"Turnout category"</span>,
+    y = <span class="r-string">"Number of constituencies"</span>,
+    fill = <span class="r-string">"Country"</span>
   ) +
-  <span class="r-function">theme_minimal</span>(base_size = <span class="r-number">13</span>) +
+  <span class="r-function">theme_minimal</span>() +
   <span class="r-function">theme</span>(
-    plot.title = <span class="r-function">element_text</span>(face = <span class="r-string">"bold"</span>, size = <span class="r-number">16</span>),
-    plot.subtitle = <span class="r-function">element_text</span>(colour = <span class="r-string">"grey40"</span>),
-    legend.position = <span class="r-string">"bottom"</span>,
-    legend.box = <span class="r-string">"vertical"</span>
+    plot.title = <span class="r-function">element_text</span>(face = <span class="r-string">"bold"</span>, size = <span class="r-number">14</span>),
+    legend.position = <span class="r-string">"bottom"</span>
   )</code></pre>
   </div>
 
   <div class="figure-container">
-    <img src="democracy_gdp_scatter.svg" alt="Scatter plot showing Democracy Score vs GDP per Capita for 20 countries, with point size reflecting population and colour indicating region. A dashed trend line shows a positive linear relationship.">
-    <p class="figure-caption"><strong>Figure 1:</strong> Democracy Score vs GDP per Capita across 20 countries. Points are sized by population and coloured by region.</p>
+    <img src="turnout_categories.svg" alt="Dodged bar chart showing constituencies by turnout category and country. The High turnout band has the most constituencies, dominated by England.">
+    <p class="figure-caption"><strong>Figure 2:</strong> Number of constituencies by turnout category and country. The High (65&ndash;75%) band is most common. England dominates all categories due to its larger number of seats.</p>
   </div>
 
-  <h3>What the figure shows</h3>
-  <p>The scatter plot reveals a positive association between democracy score and GDP per capita across the 20 countries in this sample. Countries with higher democracy scores &mdash; such as Norway, Sweden, and Canada &mdash; tend to also have higher GDP per capita, while countries with lower democracy scores &mdash; such as Nigeria and Egypt &mdash; tend to have lower GDP per capita. The dashed trend line confirms this upward relationship, though there is considerable spread around it, which suggests that democracy alone does not determine economic output.</p>
+  <p>The high turnout band is most common, followed by medium. There are clear country differences in how many low and high seats each nation has. The categories are simple but somewhat arbitrary because they use fixed cut-offs; quantile-based bands could also be used, but these still clearly show low, average, and very high turnout seats.</p>
 
-  <p>Point size encodes population, making it easy to see that large countries like India and Indonesia have moderate democracy scores but relatively low GDP per capita, while smaller wealthy democracies cluster in the upper right. The colour coding by region highlights geographic patterns: European countries are clustered toward the upper right, while African countries fall toward the lower left. These patterns are consistent with well-known findings in comparative politics about the relationship between regime type and economic development, though the direction of causality remains debated in the literature.</p>
-
-  <h2 id="correlation">Correlation Analysis</h2>
-  <p>To support the visual impression, a simple correlation test quantifies the linear relationship.</p>
+  <h3>High vs Low Turnout Comparison</h3>
 
   <div class="code-chunk">
-    <pre><code>cor_test &lt;- <span class="r-function">cor.test</span>(country_data$democracy_score, country_data$gdp_per_capita)
-cor_test</code></pre>
-    <div class="code-output">
-	Pearson's product-moment correlation
+    <pre><code>high_turnout &lt;- uk %&gt;% <span class="r-function">filter</span>(turnout_registered &gt; <span class="r-number">70</span>)
+low_turnout  &lt;- uk %&gt;% <span class="r-function">filter</span>(turnout_registered &lt; <span class="r-number">60</span>)
 
-data:  country_data$democracy_score and country_data$gdp_per_capita
-t = 4.3821, df = 18, p-value = 0.0003577
-alternative hypothesis: true correlation is not equal to 0
-95 percent confidence interval:
- 0.3962694 0.8822476
-sample estimates:
-      cor
-0.7184663</div>
+high_summary &lt;- high_turnout %&gt;%
+  <span class="r-function">group_by</span>(country) %&gt;%
+  <span class="r-function">summarise</span>(
+    n_constituencies = <span class="r-function">n</span>(),
+    mean_electorate  = <span class="r-function">mean</span>(electorate),
+    mean_turnout     = <span class="r-function">mean</span>(turnout_registered),
+    .groups = <span class="r-string">"drop"</span>
+  )
+
+low_summary &lt;- low_turnout %&gt;%
+  <span class="r-function">group_by</span>(country) %&gt;%
+  <span class="r-function">summarise</span>(
+    n_constituencies = <span class="r-function">n</span>(),
+    mean_electorate  = <span class="r-function">mean</span>(electorate),
+    mean_turnout     = <span class="r-function">mean</span>(turnout_registered),
+    .groups = <span class="r-string">"drop"</span>
+  )
+
+comparison &lt;- <span class="r-function">bind_rows</span>(
+  high_summary %&gt;% <span class="r-function">mutate</span>(group = <span class="r-string">"High Turnout (&gt;70%)"</span>),
+  low_summary  %&gt;% <span class="r-function">mutate</span>(group = <span class="r-string">"Low Turnout (&lt;60%)"</span>)
+) %&gt;%
+  <span class="r-function">select</span>(group, country, n_constituencies, mean_electorate, mean_turnout)
+comparison</code></pre>
+    <div class="code-output"><table>
+<thead><tr><th>group</th><th>country</th><th style="text-align:right">n_constituencies</th><th style="text-align:right">mean_electorate</th><th style="text-align:right">mean_turnout</th></tr></thead>
+<tbody>
+<tr><td>High Turnout (&gt;70%)</td><td>England</td><td style="text-align:right">112</td><td style="text-align:right">71,234</td><td style="text-align:right">73.41</td></tr>
+<tr><td>High Turnout (&gt;70%)</td><td>Scotland</td><td style="text-align:right">8</td><td style="text-align:right">68,432</td><td style="text-align:right">72.18</td></tr>
+<tr><td>High Turnout (&gt;70%)</td><td>Wales</td><td style="text-align:right">4</td><td style="text-align:right">66,543</td><td style="text-align:right">71.87</td></tr>
+<tr><td>Low Turnout (&lt;60%)</td><td>England</td><td style="text-align:right">165</td><td style="text-align:right">78,432</td><td style="text-align:right">54.23</td></tr>
+<tr><td>Low Turnout (&lt;60%)</td><td>Northern Ireland</td><td style="text-align:right">10</td><td style="text-align:right">65,876</td><td style="text-align:right">53.87</td></tr>
+<tr><td>Low Turnout (&lt;60%)</td><td>Scotland</td><td style="text-align:right">18</td><td style="text-align:right">67,321</td><td style="text-align:right">55.12</td></tr>
+<tr><td>Low Turnout (&lt;60%)</td><td>Wales</td><td style="text-align:right">8</td><td style="text-align:right">64,987</td><td style="text-align:right">56.34</td></tr>
+</tbody>
+</table></div>
   </div>
 
-  <p>The Pearson correlation coefficient is <span class="inline-code">0.718</span>, which indicates a strong positive linear association. The p-value is well below 0.05, suggesting the relationship is statistically significant in this sample. However, with only 20 observations, these results should be interpreted cautiously and are intended here as a demonstration of method rather than a definitive finding.</p>
+  <p>High-turnout seats generally have somewhat different electorate sizes and country mix compared to low-turnout seats. Low-turnout places are often more urban and more deprived, with weaker engagement and trust. High-turnout places tend to be more politically engaged and sometimes more competitive. These structural differences help explain the turnout gap between areas.</p>
 
   <h2 id="conclusion">Conclusion</h2>
-  <p>This showcase demonstrates the workflow I developed during GV300: assembling data, computing summary statistics, producing a multi-layered visualisation, and interpreting the results in the context of political science. The tools used &mdash; R, dplyr, and ggplot2 &mdash; allowed me to move from raw data to a polished, informative figure in a reproducible pipeline.</p>
+  <p>This assignment showed that UK constituencies vary considerably in size and turnout, raising questions about the equality of representation under first-past-the-post. The combination of tidyverse data wrangling and ggplot2 visualisation made it possible to move from raw parliamentary data to clear, interpretable findings in a reproducible workflow.</p>
 
   <p>The source code for this site is available on <a href="https://github.com/bandarj300/.github.io">GitHub</a>.</p>
 

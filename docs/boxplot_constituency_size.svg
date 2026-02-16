@@ -1,0 +1,190 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500" font-family="Arial, Helvetica, sans-serif">
+  <defs>
+    <style>
+      .grid-line { stroke: #d9d9d9; stroke-width: 0.8; }
+      .axis-text { font-size: 11px; fill: #4d4d4d; }
+      .axis-title { font-size: 12.5px; fill: #4d4d4d; }
+      .plot-title { font-size: 15px; fill: #1a1a1a; font-weight: bold; }
+      .plot-subtitle { font-size: 11.5px; fill: #737373; }
+      .tick-text { font-size: 10.5px; fill: #4d4d4d; }
+      .box { fill: steelblue; fill-opacity: 0.7; stroke: #2c5f8a; stroke-width: 1.2; }
+      .median-line { stroke: #1a1a1a; stroke-width: 1.8; }
+      .whisker { stroke: #2c5f8a; stroke-width: 1.2; }
+      .whisker-cap { stroke: #2c5f8a; stroke-width: 1.2; }
+      .outlier { fill: #4d4d4d; fill-opacity: 0.6; stroke: none; }
+    </style>
+  </defs>
+
+  <!-- White background -->
+  <rect width="800" height="500" fill="white"/>
+
+  <!-- Plot margins: top=65, right=30, bottom=60, left=75 -->
+  <!-- Plot area: x=75..770, y=65..440 => width=695, height=375 -->
+
+  <!-- Title and subtitle -->
+  <text x="75" y="25" class="plot-title">Constituency Size (Valid Votes) by Country</text>
+  <text x="75" y="46" class="plot-subtitle">Boxplots show median, spread, and outliers</text>
+
+  <!-- Y-axis scale: 20000 to 60000, step 5000 -->
+  <!-- y mapping: value -> 440 - (value - 20000) / (60000 - 20000) * 375 -->
+  <!-- 20000 -> 440, 25000 -> 416.6, 30000 -> 393.3, 35000 -> 369.8, 40000 -> 346.4, 45000 -> 323.0, 50000 -> 299.5, 55000 -> 276.1, 60000 -> 252.7... wait let me recalc -->
+  <!-- y(v) = 440 - (v - 20000) * 375 / 40000 = 440 - (v-20000)*0.009375 -->
+  <!-- 20000 -> 440.0 -->
+  <!-- 25000 -> 393.1 -->
+  <!-- 30000 -> 346.3 -->
+  <!-- 35000 -> 299.4 -->
+  <!-- 40000 -> 252.5 -->
+  <!-- 45000 -> 205.6 -->
+  <!-- 50000 -> 158.8 -->
+  <!-- 55000 -> 111.9 -->
+  <!-- 60000 -> 65.0 -->
+
+  <!-- Horizontal gridlines (theme_minimal: no axis lines, just gridlines) -->
+  <line x1="75" y1="440.0" x2="770" y2="440.0" class="grid-line"/>
+  <line x1="75" y1="393.1" x2="770" y2="393.1" class="grid-line"/>
+  <line x1="75" y1="346.3" x2="770" y2="346.3" class="grid-line"/>
+  <line x1="75" y1="299.4" x2="770" y2="299.4" class="grid-line"/>
+  <line x1="75" y1="252.5" x2="770" y2="252.5" class="grid-line"/>
+  <line x1="75" y1="205.6" x2="770" y2="205.6" class="grid-line"/>
+  <line x1="75" y1="158.8" x2="770" y2="158.8" class="grid-line"/>
+  <line x1="75" y1="111.9" x2="770" y2="111.9" class="grid-line"/>
+  <line x1="75" y1="65.0" x2="770" y2="65.0" class="grid-line"/>
+
+  <!-- Y-axis tick labels (right-aligned at x=70) -->
+  <text x="70" y="443.5" class="tick-text" text-anchor="end">20,000</text>
+  <text x="70" y="396.6" class="tick-text" text-anchor="end">25,000</text>
+  <text x="70" y="349.8" class="tick-text" text-anchor="end">30,000</text>
+  <text x="70" y="302.9" class="tick-text" text-anchor="end">35,000</text>
+  <text x="70" y="256.0" class="tick-text" text-anchor="end">40,000</text>
+  <text x="70" y="209.1" class="tick-text" text-anchor="end">45,000</text>
+  <text x="70" y="162.3" class="tick-text" text-anchor="end">50,000</text>
+  <text x="70" y="115.4" class="tick-text" text-anchor="end">55,000</text>
+  <text x="70" y="68.5" class="tick-text" text-anchor="end">60,000</text>
+
+  <!-- Y-axis title (rotated) -->
+  <text x="22" y="252" class="axis-title" text-anchor="middle" transform="rotate(-90, 22, 252)">Valid votes</text>
+
+  <!-- X-axis positions: 4 categories evenly spaced in plot area -->
+  <!-- plot x range: 75..770, width=695 -->
+  <!-- 4 groups: centers at 75 + 695*(0.5/4), 75 + 695*(1.5/4), 75 + 695*(2.5/4), 75 + 695*(3.5/4) -->
+  <!-- = 75 + 86.9, 75 + 260.6, 75 + 434.4, 75 + 608.1 -->
+  <!-- = 161.9, 335.6, 509.4, 683.1 -->
+  <!-- Box half-width: ~55 -->
+
+  <!-- X-axis labels -->
+  <text x="161.9" y="465" class="tick-text" text-anchor="middle">England</text>
+  <text x="335.6" y="465" class="tick-text" text-anchor="middle">Northern Ireland</text>
+  <text x="509.4" y="465" class="tick-text" text-anchor="middle">Scotland</text>
+  <text x="683.1" y="465" class="tick-text" text-anchor="middle">Wales</text>
+
+  <!-- ============================================================ -->
+  <!-- ENGLAND: median=42000, Q1=38000, Q3=47000, whisker_lo=28000, whisker_hi=55000 -->
+  <!-- y(28000) = 440 - 8000*0.009375 = 365.0 -->
+  <!-- y(38000) = 440 - 18000*0.009375 = 271.3 -->
+  <!-- y(42000) = 440 - 22000*0.009375 = 233.8 -->
+  <!-- y(47000) = 440 - 27000*0.009375 = 186.9 -->
+  <!-- y(55000) = 440 - 35000*0.009375 = 111.9 -->
+  <!-- ============================================================ -->
+
+  <!-- England whisker lower -->
+  <line x1="161.9" y1="365.0" x2="161.9" y2="271.3" class="whisker"/>
+  <line x1="141.9" y1="365.0" x2="181.9" y2="365.0" class="whisker-cap"/>
+  <!-- England whisker upper -->
+  <line x1="161.9" y1="186.9" x2="161.9" y2="111.9" class="whisker"/>
+  <line x1="141.9" y1="111.9" x2="181.9" y2="111.9" class="whisker-cap"/>
+  <!-- England box: Q1(271.3) to Q3(186.9) -->
+  <rect x="106.9" y="186.9" width="110" height="84.4" class="box"/>
+  <!-- England median line -->
+  <line x1="106.9" y1="233.8" x2="216.9" y2="233.8" class="median-line"/>
+
+  <!-- England outliers -->
+  <!-- ~25000: y = 440 - 5000*0.009375 = 393.1 -->
+  <circle cx="155" cy="393.1" r="3.2" class="outlier"/>
+  <!-- ~26000: y = 440 - 6000*0.009375 = 383.8 -->
+  <circle cx="168" cy="383.8" r="3.2" class="outlier"/>
+  <!-- ~25500: y = 388.4 -->
+  <circle cx="160" cy="388.4" r="3.2" class="outlier"/>
+  <!-- ~57000: y = 440 - 37000*0.009375 = 93.1 -->
+  <circle cx="157" cy="93.1" r="3.2" class="outlier"/>
+  <!-- ~58000: y = 440 - 38000*0.009375 = 83.8 -->
+  <circle cx="166" cy="83.8" r="3.2" class="outlier"/>
+  <!-- ~56500: y = 97.8 -->
+  <circle cx="152" cy="97.8" r="3.2" class="outlier"/>
+  <!-- ~27000: y = 374.4 -->
+  <circle cx="172" cy="374.4" r="3.2" class="outlier"/>
+
+  <!-- ============================================================ -->
+  <!-- NORTHERN IRELAND: median=38000, Q1=33000, Q3=42000, whisker_lo=25000, whisker_hi=48000 -->
+  <!-- y(25000) = 393.1 -->
+  <!-- y(33000) = 440 - 13000*0.009375 = 318.1 -->
+  <!-- y(38000) = 271.3 -->
+  <!-- y(42000) = 233.8 -->
+  <!-- y(48000) = 440 - 28000*0.009375 = 177.5 -->
+  <!-- ============================================================ -->
+
+  <!-- NI whisker lower -->
+  <line x1="335.6" y1="393.1" x2="335.6" y2="318.1" class="whisker"/>
+  <line x1="315.6" y1="393.1" x2="355.6" y2="393.1" class="whisker-cap"/>
+  <!-- NI whisker upper -->
+  <line x1="335.6" y1="233.8" x2="335.6" y2="177.5" class="whisker"/>
+  <line x1="315.6" y1="177.5" x2="355.6" y2="177.5" class="whisker-cap"/>
+  <!-- NI box -->
+  <rect x="280.6" y="233.8" width="110" height="84.4" class="box"/>
+  <!-- NI median -->
+  <line x1="280.6" y1="271.3" x2="390.6" y2="271.3" class="median-line"/>
+
+  <!-- NI outlier (none specified, but small n means less likely; skip or add one mild) -->
+
+  <!-- ============================================================ -->
+  <!-- SCOTLAND: median=37000, Q1=33000, Q3=41000, whisker_lo=24000, whisker_hi=49000 -->
+  <!-- y(24000) = 440 - 4000*0.009375 = 402.5 -->
+  <!-- y(33000) = 318.1 -->
+  <!-- y(37000) = 440 - 17000*0.009375 = 280.6 -->
+  <!-- y(41000) = 440 - 21000*0.009375 = 243.1 -->
+  <!-- y(49000) = 440 - 29000*0.009375 = 168.1 -->
+  <!-- ============================================================ -->
+
+  <!-- Scotland whisker lower -->
+  <line x1="509.4" y1="402.5" x2="509.4" y2="318.1" class="whisker"/>
+  <line x1="489.4" y1="402.5" x2="529.4" y2="402.5" class="whisker-cap"/>
+  <!-- Scotland whisker upper -->
+  <line x1="509.4" y1="243.1" x2="509.4" y2="168.1" class="whisker"/>
+  <line x1="489.4" y1="168.1" x2="529.4" y2="168.1" class="whisker-cap"/>
+  <!-- Scotland box -->
+  <rect x="454.4" y="243.1" width="110" height="75.0" class="box"/>
+  <!-- Scotland median -->
+  <line x1="454.4" y1="280.6" x2="564.4" y2="280.6" class="median-line"/>
+
+  <!-- Scotland outliers -->
+  <!-- ~22000: y = 440 - 2000*0.009375 = 421.3 -->
+  <circle cx="506" cy="421.3" r="3.2" class="outlier"/>
+  <!-- ~50000: y = 158.8 -->
+  <circle cx="513" cy="158.8" r="3.2" class="outlier"/>
+
+  <!-- ============================================================ -->
+  <!-- WALES: median=36000, Q1=32000, Q3=40000, whisker_lo=26000, whisker_hi=47000 -->
+  <!-- y(26000) = 440 - 6000*0.009375 = 383.8 -->
+  <!-- y(32000) = 440 - 12000*0.009375 = 327.5 -->
+  <!-- y(36000) = 440 - 16000*0.009375 = 290.0 -->
+  <!-- y(40000) = 252.5 -->
+  <!-- y(47000) = 186.9 -->
+  <!-- ============================================================ -->
+
+  <!-- Wales whisker lower -->
+  <line x1="683.1" y1="383.8" x2="683.1" y2="327.5" class="whisker"/>
+  <line x1="663.1" y1="383.8" x2="703.1" y2="383.8" class="whisker-cap"/>
+  <!-- Wales whisker upper -->
+  <line x1="683.1" y1="252.5" x2="683.1" y2="186.9" class="whisker"/>
+  <line x1="663.1" y1="186.9" x2="703.1" y2="186.9" class="whisker-cap"/>
+  <!-- Wales box -->
+  <rect x="628.1" y="252.5" width="110" height="75.0" class="box"/>
+  <!-- Wales median -->
+  <line x1="628.1" y1="290.0" x2="738.1" y2="290.0" class="median-line"/>
+
+  <!-- Wales outliers -->
+  <!-- ~24000: y = 402.5 -->
+  <circle cx="680" cy="402.5" r="3.2" class="outlier"/>
+  <!-- ~25000: y = 393.1 -->
+  <circle cx="688" cy="393.1" r="3.2" class="outlier"/>
+
+</svg>
