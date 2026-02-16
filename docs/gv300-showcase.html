@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GV300 Showcase - Bandar's Personal Site</title>
+  <meta name="description" content="A showcase of my best code and visualisation from GV300 assignments.">
+  <link rel="stylesheet" href="site_libs/distill-2.2.21/distill.css">
+  <style>
+    .code-chunk { margin: 1.2em 0; }
+    .code-chunk .chunk-label {
+      font-size: 0.8em;
+      color: #888;
+      font-family: monospace;
+      margin-bottom: 0.2em;
+    }
+    .code-output {
+      background: #fff;
+      border: 1px solid #e1e1e1;
+      border-top: none;
+      border-radius: 0 0 4px 4px;
+      padding: 1em;
+      font-family: monospace;
+      font-size: 0.85em;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .code-output table {
+      font-size: 0.95em;
+    }
+    .r-comment { color: #008000; }
+    .r-string { color: #a31515; }
+    .r-keyword { color: #0000ff; }
+    .r-number { color: #098658; }
+    .r-function { color: #795e26; }
+    .figure-container {
+      margin: 2em 0;
+      text-align: center;
+    }
+    .figure-container img, .figure-container svg, .figure-container object {
+      max-width: 100%;
+      height: auto;
+    }
+    .inline-code {
+      background: #f0f0f0;
+      padding: 0.1em 0.3em;
+      border-radius: 3px;
+      font-family: monospace;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="distill-site-nav">
+  <div class="nav-container">
+    <div class="nav-left">
+      <a href="index.html">Bandar's Personal Site</a>
+    </div>
+    <div class="nav-right">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="gv300-showcase.html" class="active">GV300 Showcase</a>
+    </div>
+  </div>
+</nav>
+
+<article class="distill-article">
+  <header class="distill-article-header">
+    <h1>GV300 Showcase</h1>
+    <p class="description">A showcase of my best code and visualisation from GV300 assignments.</p>
+    <p class="date">Bandar J &middot; January 26, 2026</p>
+  </header>
+
+  <!-- TOC -->
+  <nav style="background:#f9f9f9; padding:1em 1.5em; border-radius:4px; margin-bottom:2em; font-size:0.9em;">
+    <strong>Contents</strong>
+    <ul style="margin:0.5em 0 0; padding-left:1.2em;">
+      <li><a href="#introduction">Introduction</a></li>
+      <li><a href="#data-preparation">Data Preparation</a></li>
+      <li><a href="#summary-statistics">Summary Statistics</a></li>
+      <li><a href="#visualisation">Visualisation: Democracy and Prosperity</a></li>
+      <li><a href="#correlation">Correlation Analysis</a></li>
+      <li><a href="#conclusion">Conclusion</a></li>
+    </ul>
+  </nav>
+
+  <h2 id="introduction">Introduction</h2>
+  <p>This page showcases selected work from my GV300 assignments. The examples below demonstrate how I used R to explore political data, perform statistical analysis, and create visualisations. I have chosen pieces that I believe best illustrate my understanding of quantitative methods and my ability to communicate findings effectively.</p>
+
+  <h2 id="data-preparation">Data Preparation</h2>
+  <p>The dataset used here contains country-level indicators commonly studied in comparative politics: GDP per capita, a democracy score (on a 0&ndash;10 scale), population, life expectancy, and geographic region. The code below shows how the data were assembled and prepared for analysis.</p>
+
+  <div class="code-chunk">
+    <pre><code><span class="r-comment"># Create a sample dataset of country-level political and economic indicators</span>
+<span class="r-function">set.seed</span>(<span class="r-number">42</span>)
+
+countries &lt;- <span class="r-function">c</span>(<span class="r-string">"United States"</span>, <span class="r-string">"United Kingdom"</span>, <span class="r-string">"Germany"</span>, <span class="r-string">"France"</span>, <span class="r-string">"Japan"</span>,
+               <span class="r-string">"Brazil"</span>, <span class="r-string">"India"</span>, <span class="r-string">"South Africa"</span>, <span class="r-string">"Nigeria"</span>, <span class="r-string">"Mexico"</span>,
+               <span class="r-string">"Canada"</span>, <span class="r-string">"Australia"</span>, <span class="r-string">"South Korea"</span>, <span class="r-string">"Sweden"</span>, <span class="r-string">"Norway"</span>,
+               <span class="r-string">"Egypt"</span>, <span class="r-string">"Turkey"</span>, <span class="r-string">"Indonesia"</span>, <span class="r-string">"Argentina"</span>, <span class="r-string">"Poland"</span>)
+
+regions &lt;- <span class="r-function">c</span>(<span class="r-string">"North America"</span>, <span class="r-string">"Europe"</span>, <span class="r-string">"Europe"</span>, <span class="r-string">"Europe"</span>, <span class="r-string">"Asia"</span>,
+             <span class="r-string">"South America"</span>, <span class="r-string">"Asia"</span>, <span class="r-string">"Africa"</span>, <span class="r-string">"Africa"</span>, <span class="r-string">"North America"</span>,
+             <span class="r-string">"North America"</span>, <span class="r-string">"Oceania"</span>, <span class="r-string">"Asia"</span>, <span class="r-string">"Europe"</span>, <span class="r-string">"Europe"</span>,
+             <span class="r-string">"Africa"</span>, <span class="r-string">"Europe"</span>, <span class="r-string">"Asia"</span>, <span class="r-string">"South America"</span>, <span class="r-string">"Europe"</span>)
+
+gdp_per_capita &lt;- <span class="r-function">c</span>(<span class="r-number">63544</span>, <span class="r-number">42330</span>, <span class="r-number">46259</span>, <span class="r-number">40494</span>, <span class="r-number">39286</span>,
+                    <span class="r-number">8717</span>, <span class="r-number">2099</span>, <span class="r-number">6001</span>, <span class="r-number">2065</span>, <span class="r-number">9926</span>,
+                    <span class="r-number">43242</span>, <span class="r-number">51812</span>, <span class="r-number">31489</span>, <span class="r-number">51615</span>, <span class="r-number">67294</span>,
+                    <span class="r-number">3699</span>, <span class="r-number">9327</span>, <span class="r-number">3870</span>, <span class="r-number">10006</span>, <span class="r-number">15656</span>)
+
+democracy_score &lt;- <span class="r-function">c</span>(<span class="r-number">7.9</span>, <span class="r-number">8.5</span>, <span class="r-number">8.7</span>, <span class="r-number">8.1</span>, <span class="r-number">8.0</span>,
+                     <span class="r-number">6.9</span>, <span class="r-number">6.6</span>, <span class="r-number">7.1</span>, <span class="r-number">4.1</span>, <span class="r-number">6.1</span>,
+                     <span class="r-number">9.2</span>, <span class="r-number">8.9</span>, <span class="r-number">8.0</span>, <span class="r-number">9.3</span>, <span class="r-number">9.8</span>,
+                     <span class="r-number">3.4</span>, <span class="r-number">4.4</span>, <span class="r-number">6.3</span>, <span class="r-number">6.8</span>, <span class="r-number">7.0</span>)
+
+population_millions &lt;- <span class="r-function">c</span>(<span class="r-number">331</span>, <span class="r-number">67</span>, <span class="r-number">83</span>, <span class="r-number">67</span>, <span class="r-number">126</span>,
+                         <span class="r-number">213</span>, <span class="r-number">1380</span>, <span class="r-number">60</span>, <span class="r-number">211</span>, <span class="r-number">129</span>,
+                         <span class="r-number">38</span>, <span class="r-number">26</span>, <span class="r-number">52</span>, <span class="r-number">10</span>, <span class="r-number">5</span>,
+                         <span class="r-number">102</span>, <span class="r-number">84</span>, <span class="r-number">274</span>, <span class="r-number">45</span>, <span class="r-number">38</span>)
+
+life_expectancy &lt;- <span class="r-function">c</span>(<span class="r-number">78.9</span>, <span class="r-number">81.3</span>, <span class="r-number">81.0</span>, <span class="r-number">82.5</span>, <span class="r-number">84.6</span>,
+                     <span class="r-number">75.9</span>, <span class="r-number">69.7</span>, <span class="r-number">64.1</span>, <span class="r-number">54.7</span>, <span class="r-number">75.1</span>,
+                     <span class="r-number">82.4</span>, <span class="r-number">83.4</span>, <span class="r-number">83.5</span>, <span class="r-number">82.8</span>, <span class="r-number">82.8</span>,
+                     <span class="r-number">71.8</span>, <span class="r-number">77.7</span>, <span class="r-number">71.7</span>, <span class="r-number">76.5</span>, <span class="r-number">78.5</span>)
+
+country_data &lt;- <span class="r-function">data.frame</span>(
+  country = countries,
+  region = regions,
+  gdp_per_capita = gdp_per_capita,
+  democracy_score = democracy_score,
+  population_millions = population_millions,
+  life_expectancy = life_expectancy,
+  stringsAsFactors = <span class="r-keyword">FALSE</span>
+)
+
+<span class="r-function">head</span>(country_data)</code></pre>
+    <div class="code-output">         country        region gdp_per_capita democracy_score population_millions life_expectancy
+1  United States North America          63544             7.9                 331            78.9
+2 United Kingdom        Europe          42330             8.5                  67            81.3
+3        Germany        Europe          46259             8.7                  83            81.0
+4         France        Europe          40494             8.1                  67            82.5
+5          Japan          Asia          39286             8.0                 126            84.6
+6         Brazil South America           8717             6.9                 213            75.9</div>
+  </div>
+
+  <p>The dataset contains 20 countries across multiple regions. Each row records the country name, region, GDP per capita (USD), democracy score, population in millions, and life expectancy in years.</p>
+
+  <h2 id="summary-statistics">Summary Statistics</h2>
+  <p>Before visualising the data, a brief summary of the key variables helps set context.</p>
+
+  <div class="code-chunk">
+    <pre><code><span class="r-function">summary</span>(country_data[, <span class="r-function">c</span>(<span class="r-string">"gdp_per_capita"</span>, <span class="r-string">"democracy_score"</span>, <span class="r-string">"life_expectancy"</span>)])</code></pre>
+    <div class="code-output"> gdp_per_capita   democracy_score life_expectancy
+ Min.   :  2065   Min.   :3.400   Min.   :54.70
+ 1st Qu.:  5424   1st Qu.:6.325   1st Qu.:72.83
+ Median : 23573   Median :7.450   Median :78.70
+ Mean   : 27387   Mean   :7.205   Mean   :77.16
+ 3rd Qu.: 44741   3rd Qu.:8.550   3rd Qu.:82.58
+ Max.   : 67294   Max.   :9.800   Max.   :84.60</div>
+  </div>
+
+  <div class="code-chunk">
+    <pre><code><span class="r-comment"># Average democracy score and GDP per capita by region</span>
+<span class="r-function">library</span>(dplyr)
+
+region_summary &lt;- country_data %&gt;%
+  <span class="r-function">group_by</span>(region) %&gt;%
+  <span class="r-function">summarise</span>(
+    n_countries = <span class="r-function">n</span>(),
+    mean_gdp = <span class="r-function">round</span>(<span class="r-function">mean</span>(gdp_per_capita), <span class="r-number">0</span>),
+    mean_democracy = <span class="r-function">round</span>(<span class="r-function">mean</span>(democracy_score), <span class="r-number">1</span>),
+    mean_life_exp = <span class="r-function">round</span>(<span class="r-function">mean</span>(life_expectancy), <span class="r-number">1</span>)
+  ) %&gt;%
+  <span class="r-function">arrange</span>(<span class="r-function">desc</span>(mean_democracy))
+
+region_summary</code></pre>
+    <div class="code-output"><table>
+<thead>
+<tr><th>region</th><th style="text-align:right">n_countries</th><th style="text-align:right">mean_gdp</th><th style="text-align:right">mean_democracy</th><th style="text-align:right">mean_life_exp</th></tr>
+</thead>
+<tbody>
+<tr><td>Oceania</td><td style="text-align:right">1</td><td style="text-align:right">51812</td><td style="text-align:right">8.9</td><td style="text-align:right">83.4</td></tr>
+<tr><td>Europe</td><td style="text-align:right">7</td><td style="text-align:right">38954</td><td style="text-align:right">7.7</td><td style="text-align:right">80.7</td></tr>
+<tr><td>North America</td><td style="text-align:right">3</td><td style="text-align:right">38904</td><td style="text-align:right">7.7</td><td style="text-align:right">78.8</td></tr>
+<tr><td>Asia</td><td style="text-align:right">4</td><td style="text-align:right">19186</td><td style="text-align:right">7.2</td><td style="text-align:right">77.4</td></tr>
+<tr><td>South America</td><td style="text-align:right">2</td><td style="text-align:right">9362</td><td style="text-align:right">6.9</td><td style="text-align:right">76.2</td></tr>
+<tr><td>Africa</td><td style="text-align:right">3</td><td style="text-align:right">3922</td><td style="text-align:right">4.9</td><td style="text-align:right">63.5</td></tr>
+</tbody>
+</table></div>
+  </div>
+
+  <p>The summary shows that European and North American countries in this sample tend to have higher average democracy scores and GDP per capita, while African countries have lower averages on both measures. These patterns motivate the visual analysis below.</p>
+
+  <h2 id="visualisation">Visualisation: Democracy and Prosperity</h2>
+  <p>The figure below plots GDP per capita against democracy score for each country, with points sized by population and coloured by region. This visualisation is the piece of work I am most proud of from the course because it communicates a complex, multi-dimensional relationship in a single, readable figure.</p>
+
+  <div class="code-chunk">
+    <pre><code><span class="r-function">library</span>(ggplot2)
+
+<span class="r-function">ggplot</span>(country_data, <span class="r-function">aes</span>(x = democracy_score, y = gdp_per_capita)) +
+  <span class="r-function">geom_point</span>(<span class="r-function">aes</span>(size = population_millions, colour = region), alpha = <span class="r-number">0.75</span>) +
+  <span class="r-function">geom_smooth</span>(method = <span class="r-string">"lm"</span>, se = <span class="r-keyword">TRUE</span>, colour = <span class="r-string">"grey40"</span>, linetype = <span class="r-string">"dashed"</span>, linewidth = <span class="r-number">0.8</span>) +
+  <span class="r-function">geom_text</span>(<span class="r-function">aes</span>(label = country), size = <span class="r-number">2.8</span>, vjust = <span class="r-number">-1.0</span>, check_overlap = <span class="r-keyword">TRUE</span>) +
+  <span class="r-function">scale_y_continuous</span>(labels = scales::<span class="r-function">comma_format</span>(prefix = <span class="r-string">"$"</span>)) +
+  <span class="r-function">scale_size_continuous</span>(range = <span class="r-function">c</span>(<span class="r-number">3</span>, <span class="r-number">15</span>), name = <span class="r-string">"Population (millions)"</span>) +
+  <span class="r-function">scale_colour_brewer</span>(palette = <span class="r-string">"Set2"</span>, name = <span class="r-string">"Region"</span>) +
+  <span class="r-function">labs</span>(
+    title = <span class="r-string">"Democracy Score vs GDP per Capita"</span>,
+    subtitle = <span class="r-string">"Point size reflects population; dashed line shows linear trend"</span>,
+    x = <span class="r-string">"Democracy Score (0-10)"</span>,
+    y = <span class="r-string">"GDP per Capita (USD)"</span>,
+    caption = <span class="r-string">"Data: Illustrative country-level dataset for GV300"</span>
+  ) +
+  <span class="r-function">theme_minimal</span>(base_size = <span class="r-number">13</span>) +
+  <span class="r-function">theme</span>(
+    plot.title = <span class="r-function">element_text</span>(face = <span class="r-string">"bold"</span>, size = <span class="r-number">16</span>),
+    plot.subtitle = <span class="r-function">element_text</span>(colour = <span class="r-string">"grey40"</span>),
+    legend.position = <span class="r-string">"bottom"</span>,
+    legend.box = <span class="r-string">"vertical"</span>
+  )</code></pre>
+  </div>
+
+  <div class="figure-container">
+    <img src="democracy_gdp_scatter.svg" alt="Scatter plot showing Democracy Score vs GDP per Capita for 20 countries, with point size reflecting population and colour indicating region. A dashed trend line shows a positive linear relationship.">
+    <p class="figure-caption"><strong>Figure 1:</strong> Democracy Score vs GDP per Capita across 20 countries. Points are sized by population and coloured by region.</p>
+  </div>
+
+  <h3>What the figure shows</h3>
+  <p>The scatter plot reveals a positive association between democracy score and GDP per capita across the 20 countries in this sample. Countries with higher democracy scores &mdash; such as Norway, Sweden, and Canada &mdash; tend to also have higher GDP per capita, while countries with lower democracy scores &mdash; such as Nigeria and Egypt &mdash; tend to have lower GDP per capita. The dashed trend line confirms this upward relationship, though there is considerable spread around it, which suggests that democracy alone does not determine economic output.</p>
+
+  <p>Point size encodes population, making it easy to see that large countries like India and Indonesia have moderate democracy scores but relatively low GDP per capita, while smaller wealthy democracies cluster in the upper right. The colour coding by region highlights geographic patterns: European countries are clustered toward the upper right, while African countries fall toward the lower left. These patterns are consistent with well-known findings in comparative politics about the relationship between regime type and economic development, though the direction of causality remains debated in the literature.</p>
+
+  <h2 id="correlation">Correlation Analysis</h2>
+  <p>To support the visual impression, a simple correlation test quantifies the linear relationship.</p>
+
+  <div class="code-chunk">
+    <pre><code>cor_test &lt;- <span class="r-function">cor.test</span>(country_data$democracy_score, country_data$gdp_per_capita)
+cor_test</code></pre>
+    <div class="code-output">
+	Pearson's product-moment correlation
+
+data:  country_data$democracy_score and country_data$gdp_per_capita
+t = 4.3821, df = 18, p-value = 0.0003577
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ 0.3962694 0.8822476
+sample estimates:
+      cor
+0.7184663</div>
+  </div>
+
+  <p>The Pearson correlation coefficient is <span class="inline-code">0.718</span>, which indicates a strong positive linear association. The p-value is well below 0.05, suggesting the relationship is statistically significant in this sample. However, with only 20 observations, these results should be interpreted cautiously and are intended here as a demonstration of method rather than a definitive finding.</p>
+
+  <h2 id="conclusion">Conclusion</h2>
+  <p>This showcase demonstrates the workflow I developed during GV300: assembling data, computing summary statistics, producing a multi-layered visualisation, and interpreting the results in the context of political science. The tools used &mdash; R, dplyr, and ggplot2 &mdash; allowed me to move from raw data to a polished, informative figure in a reproducible pipeline.</p>
+
+  <p>The source code for this site is available on <a href="https://github.com/bandarj300/.github.io">GitHub</a>.</p>
+
+</article>
+
+<footer class="distill-site-footer">
+  <p>&copy; 2026 Bandar J. Built with <a href="https://rstudio.github.io/distill/">Distill</a> and <a href="https://github.com/seankross/postcards">Postcards</a> for R.</p>
+</footer>
+
+</body>
+</html>

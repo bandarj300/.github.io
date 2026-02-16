@@ -1,0 +1,29 @@
+---
+title: "Bandar J"
+image: "images/profile.jpg"
+links:
+  - label: GV300 Showcase
+    url: "gv300-showcase.html"
+  - label: About
+    url: "about.html"
+  - label: GitHub
+    url: "https://github.com/bandarj300"
+output:
+  postcards::trestles
+site: distill::distill_website
+---
+
+## About Me
+
+Welcome to my personal website. I am a student with interests in political science, data analysis, and quantitative methods. This site showcases my academic work, including projects and visualisations from GV300.
+
+## Academic Interests
+
+- Quantitative political analysis
+- Data visualisation and communication
+- Statistical methods in social science
+- Reproducible research practices
+
+## Current Work
+
+I am currently enrolled in GV300, where I apply computational methods to political science questions. Browse my [GV300 Showcase](gv300-showcase.html) to see examples of my best code and visualisations from the course.

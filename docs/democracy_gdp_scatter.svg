@@ -1,0 +1,203 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" viewBox="0 0 900 600" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <defs>
+    <clipPath id="plotArea">
+      <rect x="80" y="60" width="640" height="470"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="600" fill="white"/>
+
+  <!-- Title -->
+  <text x="80" y="24" font-size="16" font-weight="bold" fill="#333333">Democracy Score vs GDP per Capita</text>
+  <!-- Subtitle -->
+  <text x="80" y="44" font-size="11" fill="#666666">Point size reflects population; dashed line shows linear trend</text>
+
+  <!-- Plot background -->
+  <rect x="80" y="60" width="640" height="470" fill="#FAFAFA"/>
+
+  <!-- Horizontal gridlines (y-axis: 0, 10000, 20000, 30000, 40000, 50000, 60000, 70000) -->
+  <line x1="80" y1="530" x2="720" y2="530" stroke="#E0E0E0" stroke-width="0.5"/>
+  <line x1="80" y1="462.9" x2="720" y2="462.9" stroke="#E0E0E0" stroke-width="0.5"/>
+  <line x1="80" y1="395.7" x2="720" y2="395.7" stroke="#E0E0E0" stroke-width="0.5"/>
+  <line x1="80" y1="328.6" x2="720" y2="328.6" stroke="#E0E0E0" stroke-width="0.5"/>
+  <line x1="80" y1="261.4" x2="720" y2="261.4" stroke="#E0E0E0" stroke-width="0.5"/>
+  <line x1="80" y1="194.3" x2="720" y2="194.3" stroke="#E0E0E0" stroke-width="0.5"/>
+  <line x1="80" y1="127.1" x2="720" y2="127.1" stroke="#E0E0E0" stroke-width="0.5"/>
+  <line x1="80" y1="60" x2="720" y2="60" stroke="#E0E0E0" stroke-width="0.5"/>
+
+  <!-- Vertical gridlines (x-axis: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10) -->
+  <line x1="80" y1="60" x2="80" y2="530" stroke="#E0E0E0" stroke-width="0.5"/>
+  <line x1="144" y1="60" x2="144" y2="530" stroke="#E0E0E0" stroke-width="0.5"/>
+  <line x1="208" y1="60" x2="208" y2="530" stroke="#E0E0E0" stroke-width="0.5"/>
+  <line x1="272" y1="60" x2="272" y2="530" stroke="#E0E0E0" stroke-width="0.5"/>
+  <line x1="336" y1="60" x2="336" y2="530" stroke="#E0E0E0" stroke-width="0.5"/>
+  <line x1="400" y1="60" x2="400" y2="530" stroke="#E0E0E0" stroke-width="0.5"/>
+  <line x1="464" y1="60" x2="464" y2="530" stroke="#E0E0E0" stroke-width="0.5"/>
+  <line x1="528" y1="60" x2="528" y2="530" stroke="#E0E0E0" stroke-width="0.5"/>
+  <line x1="592" y1="60" x2="592" y2="530" stroke="#E0E0E0" stroke-width="0.5"/>
+  <line x1="656" y1="60" x2="656" y2="530" stroke="#E0E0E0" stroke-width="0.5"/>
+  <line x1="720" y1="60" x2="720" y2="530" stroke="#E0E0E0" stroke-width="0.5"/>
+
+  <!-- X-axis tick labels -->
+  <text x="80" y="548" font-size="10" fill="#666666" text-anchor="middle">0</text>
+  <text x="144" y="548" font-size="10" fill="#666666" text-anchor="middle">1</text>
+  <text x="208" y="548" font-size="10" fill="#666666" text-anchor="middle">2</text>
+  <text x="272" y="548" font-size="10" fill="#666666" text-anchor="middle">3</text>
+  <text x="336" y="548" font-size="10" fill="#666666" text-anchor="middle">4</text>
+  <text x="400" y="548" font-size="10" fill="#666666" text-anchor="middle">5</text>
+  <text x="464" y="548" font-size="10" fill="#666666" text-anchor="middle">6</text>
+  <text x="528" y="548" font-size="10" fill="#666666" text-anchor="middle">7</text>
+  <text x="592" y="548" font-size="10" fill="#666666" text-anchor="middle">8</text>
+  <text x="656" y="548" font-size="10" fill="#666666" text-anchor="middle">9</text>
+  <text x="720" y="548" font-size="10" fill="#666666" text-anchor="middle">10</text>
+
+  <!-- Y-axis tick labels -->
+  <text x="75" y="533.5" font-size="10" fill="#666666" text-anchor="end">$0</text>
+  <text x="75" y="466.4" font-size="10" fill="#666666" text-anchor="end">$10,000</text>
+  <text x="75" y="399.2" font-size="10" fill="#666666" text-anchor="end">$20,000</text>
+  <text x="75" y="332.1" font-size="10" fill="#666666" text-anchor="end">$30,000</text>
+  <text x="75" y="264.9" font-size="10" fill="#666666" text-anchor="end">$40,000</text>
+  <text x="75" y="197.8" font-size="10" fill="#666666" text-anchor="end">$50,000</text>
+  <text x="75" y="130.6" font-size="10" fill="#666666" text-anchor="end">$60,000</text>
+  <text x="75" y="63.5" font-size="10" fill="#666666" text-anchor="end">$70,000</text>
+
+  <!-- Trend line (dashed) clipped to plot area -->
+  <line x1="208" y1="714.3" x2="720" y2="153.3" stroke="#999999" stroke-width="1.2" stroke-dasharray="6,4" clip-path="url(#plotArea)"/>
+
+  <!-- Data points and labels (clipped to plot area) -->
+  <g clip-path="url(#plotArea)">
+    <!-- India: Asia -->
+    <circle cx="502.4" cy="515.9" r="20.0" fill="#FC8D62" opacity="0.75"/>
+    <text x="502.4" y="540" font-size="9" fill="#444444" text-anchor="middle">India</text>
+
+    <!-- Nigeria: Africa -->
+    <circle cx="342.4" cy="516.1" r="8.6" fill="#66C2A5" opacity="0.75"/>
+    <text x="342.4" y="528.7" font-size="9" fill="#444444" text-anchor="middle">Nigeria</text>
+
+    <!-- Indonesia: Asia -->
+    <circle cx="483.2" cy="504.0" r="9.5" fill="#FC8D62" opacity="0.75"/>
+    <text x="460" y="496" font-size="9" fill="#444444" text-anchor="middle">Indonesia</text>
+
+    <!-- Egypt: Africa -->
+    <circle cx="297.6" cy="505.2" r="6.6" fill="#66C2A5" opacity="0.75"/>
+    <text x="297.6" y="516" font-size="9" fill="#444444" text-anchor="middle">Egypt</text>
+
+    <!-- South Africa: Africa -->
+    <circle cx="534.4" cy="489.7" r="5.6" fill="#66C2A5" opacity="0.75"/>
+    <text x="534.4" y="500" font-size="9" fill="#444444" text-anchor="middle">S. Africa</text>
+
+    <!-- Brazil: South America -->
+    <circle cx="521.6" cy="471.5" r="8.6" fill="#FFD92F" opacity="0.75"/>
+    <text x="546" y="479" font-size="9" fill="#444444" text-anchor="start">Brazil</text>
+
+    <!-- Turkey: Europe -->
+    <circle cx="361.6" cy="467.4" r="6.2" fill="#8DA0CB" opacity="0.75"/>
+    <text x="361.6" y="458" font-size="9" fill="#444444" text-anchor="middle">Turkey</text>
+
+    <!-- Mexico: North America -->
+    <circle cx="470.4" cy="463.4" r="7.1" fill="#E78AC3" opacity="0.75"/>
+    <text x="470.4" y="454" font-size="9" fill="#444444" text-anchor="middle">Mexico</text>
+
+    <!-- Argentina: South America -->
+    <circle cx="515.2" cy="462.8" r="5.2" fill="#FFD92F" opacity="0.75"/>
+    <text x="515.2" y="454" font-size="9" fill="#444444" text-anchor="middle">Argentina</text>
+
+    <!-- Poland: Europe -->
+    <circle cx="528" cy="424.9" r="5.0" fill="#8DA0CB" opacity="0.75"/>
+    <text x="528" y="416" font-size="9" fill="#444444" text-anchor="middle">Poland</text>
+
+    <!-- South Korea: Asia -->
+    <circle cx="592" cy="318.6" r="5.4" fill="#FC8D62" opacity="0.75"/>
+    <text x="592" y="310" font-size="9" fill="#444444" text-anchor="middle">S. Korea</text>
+
+    <!-- Japan: Asia -->
+    <circle cx="592" cy="266.2" r="7.1" fill="#FC8D62" opacity="0.75"/>
+    <text x="608" y="274" font-size="9" fill="#444444" text-anchor="start">Japan</text>
+
+    <!-- France: Europe -->
+    <circle cx="598.4" cy="258.1" r="5.8" fill="#8DA0CB" opacity="0.75"/>
+    <text x="614" y="254" font-size="9" fill="#444444" text-anchor="start">France</text>
+
+    <!-- United Kingdom: Europe -->
+    <circle cx="624" cy="245.8" r="5.8" fill="#8DA0CB" opacity="0.75"/>
+    <text x="634" y="240" font-size="9" fill="#444444" text-anchor="start">UK</text>
+
+    <!-- Canada: North America -->
+    <circle cx="668.8" cy="239.7" r="5.0" fill="#E78AC3" opacity="0.75"/>
+    <text x="668.8" y="231" font-size="9" fill="#444444" text-anchor="middle">Canada</text>
+
+    <!-- Germany: Europe -->
+    <circle cx="636.8" cy="219.4" r="6.1" fill="#8DA0CB" opacity="0.75"/>
+    <text x="648" y="213" font-size="9" fill="#444444" text-anchor="start">Germany</text>
+
+    <!-- Sweden: Europe -->
+    <circle cx="675.2" cy="183.4" r="4.2" fill="#8DA0CB" opacity="0.75"/>
+    <text x="675.2" y="175" font-size="9" fill="#444444" text-anchor="middle">Sweden</text>
+
+    <!-- Australia: Oceania -->
+    <circle cx="649.6" cy="182.1" r="4.7" fill="#A6D854" opacity="0.75"/>
+    <text x="649.6" y="174" font-size="9" fill="#444444" text-anchor="middle">Australia</text>
+
+    <!-- United States: North America -->
+    <circle cx="585.6" cy="103.3" r="10.3" fill="#E78AC3" opacity="0.75"/>
+    <text x="585.6" y="90" font-size="9" fill="#444444" text-anchor="middle">United States</text>
+
+    <!-- Norway: Europe -->
+    <circle cx="707.2" cy="78.2" r="4.0" fill="#8DA0CB" opacity="0.75"/>
+    <text x="707.2" y="70" font-size="9" fill="#444444" text-anchor="middle">Norway</text>
+  </g>
+
+  <!-- X-axis label -->
+  <text x="400" y="572" font-size="12" fill="#444444" text-anchor="middle">Democracy Score (0-10)</text>
+
+  <!-- Y-axis label (rotated) -->
+  <text x="22" y="295" font-size="12" fill="#444444" text-anchor="middle" transform="rotate(-90, 22, 295)">GDP per Capita (USD)</text>
+
+  <!-- Caption -->
+  <text x="720" y="593" font-size="9" fill="#999999" text-anchor="end" font-style="italic">Data: Illustrative country-level dataset for GV300</text>
+
+  <!-- Legend: Region -->
+  <g transform="translate(740, 75)">
+    <text x="0" y="0" font-size="11" font-weight="bold" fill="#333333">Region</text>
+
+    <circle cx="8" cy="18" r="5" fill="#66C2A5" opacity="0.75"/>
+    <text x="20" y="22" font-size="10" fill="#555555">Africa</text>
+
+    <circle cx="8" cy="38" r="5" fill="#FC8D62" opacity="0.75"/>
+    <text x="20" y="42" font-size="10" fill="#555555">Asia</text>
+
+    <circle cx="8" cy="58" r="5" fill="#8DA0CB" opacity="0.75"/>
+    <text x="20" y="62" font-size="10" fill="#555555">Europe</text>
+
+    <circle cx="8" cy="78" r="5" fill="#E78AC3" opacity="0.75"/>
+    <text x="20" y="82" font-size="10" fill="#555555">N. America</text>
+
+    <circle cx="8" cy="98" r="5" fill="#A6D854" opacity="0.75"/>
+    <text x="20" y="102" font-size="10" fill="#555555">Oceania</text>
+
+    <circle cx="8" cy="118" r="5" fill="#FFD92F" opacity="0.75"/>
+    <text x="20" y="122" font-size="10" fill="#555555">S. America</text>
+  </g>
+
+  <!-- Legend: Population -->
+  <g transform="translate(740, 230)">
+    <text x="0" y="0" font-size="11" font-weight="bold" fill="#333333">Population (M)</text>
+
+    <!-- Small: 50M -->
+    <circle cx="22" cy="25" r="5.3" fill="none" stroke="#888888" stroke-width="0.8"/>
+    <text x="42" y="29" font-size="10" fill="#555555">50</text>
+
+    <!-- Medium: 500M -->
+    <circle cx="22" cy="52" r="12.4" fill="none" stroke="#888888" stroke-width="0.8"/>
+    <text x="42" y="56" font-size="10" fill="#555555">500</text>
+
+    <!-- Large: 1000M -->
+    <circle cx="22" cy="88" r="17.1" fill="none" stroke="#888888" stroke-width="0.8"/>
+    <text x="46" y="92" font-size="10" fill="#555555">1,000</text>
+  </g>
+
+  <!-- Thin axis lines at bottom and left -->
+  <line x1="80" y1="530" x2="720" y2="530" stroke="#CCCCCC" stroke-width="0.8"/>
+  <line x1="80" y1="60" x2="80" y2="530" stroke="#CCCCCC" stroke-width="0.8"/>
+</svg>

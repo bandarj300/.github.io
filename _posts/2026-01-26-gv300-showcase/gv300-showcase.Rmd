@@ -1,0 +1,154 @@
+---
+title: "GV300 Showcase"
+description: |
+  A showcase of my best code and visualisation from GV300 assignments.
+author:
+  - name: "Bandar J"
+date: 2026-01-26
+output:
+  distill::distill_article:
+    toc: true
+    toc_depth: 3
+    code_folding: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+## Introduction
+
+This page showcases selected work from my GV300 assignments. The examples below demonstrate how I used R to explore political data, perform statistical analysis, and create visualisations. I have chosen pieces that I believe best illustrate my understanding of quantitative methods and my ability to communicate findings effectively.
+
+## Data Preparation
+
+The dataset used here contains country-level indicators commonly studied in comparative politics: GDP per capita, a democracy score (on a 0--10 scale), population, life expectancy, and geographic region. The code below shows how the data were assembled and prepared for analysis.
+
+```{r data-prep}
+# Create a sample dataset of country-level political and economic indicators
+set.seed(42)
+
+countries <- c("United States", "United Kingdom", "Germany", "France", "Japan",
+               "Brazil", "India", "South Africa", "Nigeria", "Mexico",
+               "Canada", "Australia", "South Korea", "Sweden", "Norway",
+               "Egypt", "Turkey", "Indonesia", "Argentina", "Poland")
+
+regions <- c("North America", "Europe", "Europe", "Europe", "Asia",
+             "South America", "Asia", "Africa", "Africa", "North America",
+             "North America", "Oceania", "Asia", "Europe", "Europe",
+             "Africa", "Europe", "Asia", "South America", "Europe")
+
+gdp_per_capita <- c(63544, 42330, 46259, 40494, 39286,
+                    8717, 2099, 6001, 2065, 9926,
+                    43242, 51812, 31489, 51615, 67294,
+                    3699, 9327, 3870, 10006, 15656)
+
+democracy_score <- c(7.9, 8.5, 8.7, 8.1, 8.0,
+                     6.9, 6.6, 7.1, 4.1, 6.1,
+                     9.2, 8.9, 8.0, 9.3, 9.8,
+                     3.4, 4.4, 6.3, 6.8, 7.0)
+
+population_millions <- c(331, 67, 83, 67, 126,
+                         213, 1380, 60, 211, 129,
+                         38, 26, 52, 10, 5,
+                         102, 84, 274, 45, 38)
+
+life_expectancy <- c(78.9, 81.3, 81.0, 82.5, 84.6,
+                     75.9, 69.7, 64.1, 54.7, 75.1,
+                     82.4, 83.4, 83.5, 82.8, 82.8,
+                     71.8, 77.7, 71.7, 76.5, 78.5)
+
+country_data <- data.frame(
+  country = countries,
+  region = regions,
+  gdp_per_capita = gdp_per_capita,
+  democracy_score = democracy_score,
+  population_millions = population_millions,
+  life_expectancy = life_expectancy,
+  stringsAsFactors = FALSE
+)
+
+head(country_data)
+```
+
+The dataset contains `r nrow(country_data)` countries across multiple regions. Each row records the country name, region, GDP per capita (USD), democracy score, population in millions, and life expectancy in years.
+
+## Summary Statistics
+
+Before visualising the data, a brief summary of the key variables helps set context.
+
+```{r summary-stats}
+summary(country_data[, c("gdp_per_capita", "democracy_score", "life_expectancy")])
+```
+
+```{r region-summary}
+# Average democracy score and GDP per capita by region
+library(dplyr)
+
+region_summary <- country_data %>%
+  group_by(region) %>%
+  summarise(
+    n_countries = n(),
+    mean_gdp = round(mean(gdp_per_capita), 0),
+    mean_democracy = round(mean(democracy_score), 1),
+    mean_life_exp = round(mean(life_expectancy), 1)
+  ) %>%
+  arrange(desc(mean_democracy))
+
+region_summary
+```
+
+The summary shows that European and North American countries in this sample tend to have higher average democracy scores and GDP per capita, while African countries have lower averages on both measures. These patterns motivate the visual analysis below.
+
+## Visualisation: Democracy and Prosperity
+
+The figure below plots GDP per capita against democracy score for each country, with points sized by population and coloured by region. This visualisation is the piece of work I am most proud of from the course because it communicates a complex, multi-dimensional relationship in a single, readable figure.
+
+```{r main-visualisation, fig.width=10, fig.height=7}
+library(ggplot2)
+
+ggplot(country_data, aes(x = democracy_score, y = gdp_per_capita)) +
+  geom_point(aes(size = population_millions, colour = region), alpha = 0.75) +
+  geom_smooth(method = "lm", se = TRUE, colour = "grey40", linetype = "dashed", linewidth = 0.8) +
+  geom_text(aes(label = country), size = 2.8, vjust = -1.0, check_overlap = TRUE) +
+  scale_y_continuous(labels = scales::comma_format(prefix = "$")) +
+  scale_size_continuous(range = c(3, 15), name = "Population (millions)") +
+  scale_colour_brewer(palette = "Set2", name = "Region") +
+  labs(
+    title = "Democracy Score vs GDP per Capita",
+    subtitle = "Point size reflects population; dashed line shows linear trend",
+    x = "Democracy Score (0-10)",
+    y = "GDP per Capita (USD)",
+    caption = "Data: Illustrative country-level dataset for GV300"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(face = "bold", size = 16),
+    plot.subtitle = element_text(colour = "grey40"),
+    legend.position = "bottom",
+    legend.box = "vertical"
+  )
+```
+
+### What the figure shows
+
+The scatter plot reveals a positive association between democracy score and GDP per capita across the 20 countries in this sample. Countries with higher democracy scores --- such as Norway, Sweden, and Canada --- tend to also have higher GDP per capita, while countries with lower democracy scores --- such as Nigeria and Egypt --- tend to have lower GDP per capita. The dashed trend line confirms this upward relationship, though there is considerable spread around it, which suggests that democracy alone does not determine economic output.
+
+Point size encodes population, making it easy to see that large countries like India and Indonesia have moderate democracy scores but relatively low GDP per capita, while smaller wealthy democracies cluster in the upper right. The colour coding by region highlights geographic patterns: European countries are clustered toward the upper right, while African countries fall toward the lower left. These patterns are consistent with well-known findings in comparative politics about the relationship between regime type and economic development, though the direction of causality remains debated in the literature.
+
+## Correlation Analysis
+
+To support the visual impression, a simple correlation test quantifies the linear relationship.
+
+```{r correlation}
+cor_test <- cor.test(country_data$democracy_score, country_data$gdp_per_capita)
+cor_test
+```
+
+The Pearson correlation coefficient is `r round(cor_test$estimate, 3)`, which indicates a strong positive linear association. The p-value is well below 0.05, suggesting the relationship is statistically significant in this sample. However, with only 20 observations, these results should be interpreted cautiously and are intended here as a demonstration of method rather than a definitive finding.
+
+## Conclusion
+
+This showcase demonstrates the workflow I developed during GV300: assembling data, computing summary statistics, producing a multi-layered visualisation, and interpreting the results in the context of political science. The tools used --- R, dplyr, and ggplot2 --- allowed me to move from raw data to a polished, informative figure in a reproducible pipeline.
+
+The source code for this site is available on [GitHub](https://github.com/bandarj300/.github.io).
