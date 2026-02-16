@@ -11,11 +11,11 @@ output:
 
 This website was built using the [Distill](https://rstudio.github.io/distill/) and [Postcards](https://github.com/seankross/postcards) R packages, following the workflow described by [Alison Hill](https://www.apreshill.com/blog/2020-12-postcards-distill/).
 
-The site is hosted on GitHub Pages and serves as a portfolio for my academic work in GV300 and related courses.
+The site is hosted on GitHub Pages and serves as a portfolio for my academic work in GV300.
 
 ## About Me
 
-I am a university student studying political science with a focus on quantitative methods. My coursework in GV300 has involved working with data in R, producing statistical analyses, and creating visualisations to communicate findings clearly.
+I am a final year university student studying political science with a focus on quantitative methods. My coursework in GV300 has involved working with data in R, producing statistical analyses, and creating visualisations to communicate findings clearly.
 
 ## Tools and Technologies
 
