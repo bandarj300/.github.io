@@ -1,0 +1,98 @@
+/* Postcards Trestles Template */
+.postcards-trestles {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 3em 1.5em;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 3em;
+  align-items: start;
+}
+
+.postcards-trestles .profile-sidebar {
+  text-align: center;
+}
+
+.postcards-trestles .profile-image {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 1.5em;
+  border: 3px solid #eee;
+}
+
+.postcards-trestles .profile-image-placeholder {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  margin: 0 auto 1.5em;
+  background: linear-gradient(135deg, #0F2E3D 0%, #2d6a8a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 4em;
+  font-weight: 300;
+}
+
+.postcards-trestles .profile-name {
+  font-size: 1.6em;
+  font-weight: 700;
+  color: #0F2E3D;
+  margin: 0 0 0.5em;
+}
+
+.postcards-trestles .profile-links {
+  list-style: none;
+  padding: 0;
+  margin: 1em 0 0;
+}
+
+.postcards-trestles .profile-links li {
+  margin: 0.5em 0;
+}
+
+.postcards-trestles .profile-links a {
+  display: inline-block;
+  padding: 0.4em 1.2em;
+  border: 1px solid #0F2E3D;
+  border-radius: 20px;
+  color: #0F2E3D;
+  font-size: 0.9em;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.postcards-trestles .profile-links a:hover {
+  background: #0F2E3D;
+  color: #fff;
+}
+
+.postcards-trestles .profile-content h2 {
+  border-bottom: 2px solid #0F2E3D;
+  padding-bottom: 0.3em;
+  margin-top: 0;
+}
+
+.postcards-trestles .profile-content h2:first-child {
+  margin-top: 0;
+}
+
+.postcards-trestles .profile-content ul {
+  padding-left: 1.2em;
+}
+
+.postcards-trestles .profile-content li {
+  margin: 0.4em 0;
+}
+
+@media (max-width: 700px) {
+  .postcards-trestles {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .postcards-trestles .profile-content {
+    text-align: left;
+  }
+}

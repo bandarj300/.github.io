@@ -1,0 +1,30 @@
+---
+title: "About"
+description: |
+  A bit more about me and this site.
+output:
+  distill::distill_article:
+    toc: true
+---
+
+## About This Site
+
+This website was built using the [Distill](https://rstudio.github.io/distill/) and [Postcards](https://github.com/seankross/postcards) R packages, following the workflow described by [Alison Hill](https://www.apreshill.com/blog/2020-12-postcards-distill/).
+
+The site is hosted on GitHub Pages and serves as a portfolio for my academic work in GV300 and related courses.
+
+## About Me
+
+I am a university student studying political science with a focus on quantitative methods. My coursework in GV300 has involved working with data in R, producing statistical analyses, and creating visualisations to communicate findings clearly.
+
+## Tools and Technologies
+
+- **R and RStudio** for data analysis and visualisation
+- **ggplot2** for creating publication-quality figures
+- **Distill** for building this website
+- **Postcards** for the landing page design
+- **Git and GitHub** for version control and hosting
+
+## Contact
+
+You can find my work on [GitHub](https://github.com/bandarj300).
