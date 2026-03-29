@@ -1,0 +1,451 @@
+---
+title: "Text Analysis: Central Bank Communications"
+description: |
+  Applying quantitative methods from GV300 to a corpus of European Central Bank speeches (1997–2018).
+author:
+  - name: "Bandar J"
+date: "`r Sys.Date()`"
+output:
+  distill::distill_article:
+    toc: true
+    toc_depth: 3
+    code_folding: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo    = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  fig.width  = 9,
+  fig.height = 5
+)
+```
+
+## Introduction
+
+In Assignment 5, I designed a study to examine whether trust in the Bank of England is driven by personal financial circumstances or by political ideology. That research design treated trust as a **dependent variable** measured through survey responses. In this section, I flip the lens: rather than asking how citizens perceive central banks, I analyse what central banks actually *say* — and apply the same quantitative toolkit developed across this course to measure it.
+
+Using a corpus of over 3,000 speeches by European Central Bank (ECB) presidents and board members (1997–2018), I demonstrate that text is just another form of data. The methods used here — descriptive statistics, difference-in-means estimation, regression, and scale construction — are directly drawn from Assignments 2, 3, and 5. The goal is to show that these tools transfer naturally from survey data and election returns to the analysis of political language.
+
+---
+
+## Setup
+
+> **One-time installation** — paste this into your R console before knitting for the first time:
+>
+> ```r
+> install.packages(c("tidytext", "textdata", "ggwordcloud", "psych", "broom"))
+> remotes::install_github("quanteda/quanteda.corpora")
+> ```
+>
+> When `textdata` asks you to confirm downloading the AFINN and Bing lexicons, type `1` and press Enter for each.
+
+```{r packages}
+library(tidyverse)
+library(tidytext)
+library(quanteda)
+library(quanteda.corpora)
+library(ggwordcloud)
+library(psych)
+library(broom)
+library(scales)
+library(lubridate)
+```
+
+---
+
+## Data
+
+The ECB speeches corpus, provided by the `quanteda.corpora` package, contains speeches delivered by ECB presidents and executive board members from 1997 to 2018.
+
+```{r load-data}
+corp_ecb <- download("data_corpus_ECBspeeches")
+
+ecb_df <- docvars(corp_ecb) %>%
+  as_tibble() %>%
+  mutate(
+    text      = as.character(corp_ecb),
+    date      = as.Date(date),
+    year      = year(date),
+    president = case_when(
+      speaker == "Wim Duisenberg"      ~ "Duisenberg (1998–2003)",
+      speaker == "Jean-Claude Trichet" ~ "Trichet (2003–2011)",
+      speaker == "Mario Draghi"        ~ "Draghi (2011–2018)",
+      TRUE                             ~ "Board member"
+    )
+  )
+
+cat("Total speeches:  ", nrow(ecb_df), "\n")
+cat("Date range:      ", format(min(ecb_df$date)), "–", format(max(ecb_df$date)), "\n")
+cat("Unique speakers: ", n_distinct(ecb_df$speaker), "\n")
+```
+
+I then tokenise the corpus and remove stop words and numeric tokens — mirroring the data cleaning steps from **Assignment 2**, where I dropped by-elections and filtered out invalid rows before analysis.
+
+```{r tokenise}
+ecb_tokens <- ecb_df %>%
+  select(speaker, president, date, year, text) %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words, by = "word") %>%
+  filter(
+    !str_detect(word, "[0-9]"),
+    str_length(word) > 2
+  )
+
+word_freq <- ecb_tokens %>%
+  count(word, sort = TRUE)
+
+cat("Tokens after cleaning:", format(nrow(ecb_tokens), big.mark = ","), "\n")
+cat("Unique words:         ", format(nrow(word_freq), big.mark = ","), "\n")
+```
+
+---
+
+## Part 1 — Descriptive Statistics and Distributions
+
+*Methods from Assignment 2: summary statistics, histograms, boxplots*
+
+Just as Assignment 2 began by describing the distribution of constituency sizes before drawing any conclusions about inequality, I first describe the distribution of speech lengths and vocabulary.
+
+```{r speech-lengths}
+speech_stats <- ecb_df %>%
+  mutate(word_count = str_count(text, "\\S+"))
+
+speech_stats %>%
+  summarise(
+    mean_words   = round(mean(word_count)),
+    median_words = round(median(word_count)),
+    sd_words     = round(sd(word_count)),
+    min_words    = min(word_count),
+    max_words    = max(word_count)
+  )
+```
+
+```{r length-histogram, fig.cap="Distribution of ECB speech lengths. The red dashed line marks the overall mean — matching the format from Assignment 2's constituency size histogram."}
+overall_mean_words <- mean(speech_stats$word_count)
+
+ggplot(speech_stats, aes(x = word_count)) +
+  geom_histogram(bins = 40, fill = "steelblue", alpha = 0.75, color = "white") +
+  geom_vline(xintercept = overall_mean_words,
+             color = "red", linetype = "dashed", linewidth = 1) +
+  annotate("text", x = overall_mean_words + 600, y = Inf,
+           vjust = 1.8, hjust = 0, color = "red", size = 3.5,
+           label = paste0("Mean = ", round(overall_mean_words), " words")) +
+  scale_x_continuous(labels = comma) +
+  labs(
+    title    = "Distribution of ECB Speech Lengths",
+    subtitle = "Red dashed line = overall mean",
+    x        = "Word count per speech",
+    y        = "Number of speeches"
+  ) +
+  theme_minimal()
+```
+
+```{r length-boxplot, fig.cap="Speech lengths by ECB president — mirrors Assignment 2's boxplot comparing constituency sizes by country."}
+speech_stats %>%
+  filter(president != "Board member") %>%
+  ggplot(aes(x = reorder(president, word_count, median), y = word_count)) +
+  geom_boxplot(fill = "steelblue", alpha = 0.7, outlier.alpha = 0.4) +
+  coord_flip() +
+  scale_y_continuous(labels = comma) +
+  labs(
+    title = "ECB Speech Length by President",
+    subtitle = "Boxplots show median, spread, and outliers",
+    x = NULL,
+    y = "Word count per speech"
+  ) +
+  theme_minimal()
+```
+
+```{r top-words, fig.cap="Top 25 most frequent words across all ECB speeches after stop word removal."}
+word_freq %>%
+  slice_max(n, n = 25) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(x = word, y = n)) +
+  geom_col(fill = "#003399", alpha = 0.85) +
+  geom_text(aes(label = comma(n)), hjust = -0.1, size = 3, color = "gray30") +
+  coord_flip() +
+  scale_y_continuous(labels = comma, expand = expansion(mult = c(0, 0.15))) +
+  labs(
+    title    = "Top 25 Words in ECB Speeches (1997–2018)",
+    subtitle = "After removing stop words and numeric tokens",
+    x = NULL, y = "Word count"
+  ) +
+  theme_minimal() +
+  theme(panel.grid.major.y = element_blank())
+```
+
+```{r wordcloud, fig.cap="Wordcloud of the top 150 terms. Word size is proportional to frequency."}
+set.seed(42)
+word_freq %>%
+  slice_max(n, n = 150) %>%
+  ggplot(aes(label = word, size = n, color = n)) +
+  geom_text_wordcloud(eccentricity = 0.65, seed = 42) +
+  scale_size_area(max_size = 18) +
+  scale_color_gradient(low = "#7fb3e8", high = "#003399") +
+  labs(title = "ECB Speech Vocabulary — Top 150 Terms") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5))
+```
+
+The word frequency distribution is highly right-skewed — a small number of terms (*inflation*, *monetary*, *policy*) dominate, while most words appear rarely. This mirrors the skewed distribution of constituency sizes found in Assignment 2. The vocabulary itself is revealing: *euro* and *european* appear prominently, underscoring the ECB's unique supranational political context, while *market*, *banks*, and *risk* reflect the financial stability dimension of its communications.
+
+---
+
+## Part 2 — Difference-in-Means: Did the Financial Crisis Change How the ECB Speaks?
+
+*Methods from Assignment 3: difference-in-means ATE, Linear Probability Model, logistic regression*
+
+In Assignment 3, I estimated the **Average Treatment Effect** of an issue-focused homepage on supporter signup rates using a difference-in-means estimator. Here, I apply the same logic to ask: did the 2008 global financial crisis change the average sentiment of ECB speeches?
+
+I define the "treatment" as speaking in the post-crisis period (2008 onwards), and the outcome as the average AFINN sentiment score of a speech. Unlike Assignment 3, this is an observational comparison rather than a randomised experiment — but the estimation procedure is identical.
+
+```{r speech-level-afinn}
+speech_sentiment <- ecb_tokens %>%
+  inner_join(get_sentiments("afinn"), by = "word") %>%
+  group_by(speaker, president, date, year) %>%
+  summarise(
+    avg_sentiment   = mean(value),
+    n_scored_words  = n(),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    post_crisis     = as.integer(year >= 2008),
+    crisis_label    = if_else(post_crisis == 1, "Post-crisis (2008–)", "Pre-crisis (–2007)"),
+    positive_speech = as.integer(avg_sentiment > 0)
+  )
+
+cat("Pre-crisis speeches: ", sum(speech_sentiment$post_crisis == 0), "\n")
+cat("Post-crisis speeches:", sum(speech_sentiment$post_crisis == 1), "\n")
+```
+
+```{r dim-estimate}
+mean_pre   <- mean(speech_sentiment$avg_sentiment[speech_sentiment$post_crisis == 0])
+mean_post  <- mean(speech_sentiment$avg_sentiment[speech_sentiment$post_crisis == 1])
+dim_effect <- mean_post - mean_pre
+
+cat("Mean sentiment, pre-crisis: ", round(mean_pre,  4), "\n")
+cat("Mean sentiment, post-crisis:", round(mean_post, 4), "\n")
+cat("Difference-in-means:        ", round(dim_effect, 4), "\n")
+```
+
+```{r dim-plot, fig.cap="Average speech sentiment before and after the 2008 financial crisis — mirrors Assignment 3's bar chart of signup rates by treatment group."}
+tibble(
+  period        = factor(c("Pre-crisis (–2007)", "Post-crisis (2008–)"),
+                         levels = c("Pre-crisis (–2007)", "Post-crisis (2008–)")),
+  avg_sentiment = c(mean_pre, mean_post)
+) %>%
+  ggplot(aes(x = period, y = avg_sentiment, fill = period)) +
+  geom_col(width = 0.55, alpha = 0.87) +
+  geom_text(aes(label = round(avg_sentiment, 3)), vjust = -0.5,
+            fontface = "bold", size = 4.5) +
+  scale_fill_manual(values = c("Pre-crisis (–2007)" = "steelblue",
+                               "Post-crisis (2008–)" = "#cc0000")) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.2))) +
+  labs(
+    title    = "Average ECB Speech Sentiment: Pre- vs. Post-Crisis",
+    subtitle = paste0("Difference-in-means = ", round(dim_effect, 4)),
+    x = NULL, y = "Average AFINN sentiment score"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+```{r lpm-crisis}
+# Linear model: sentiment ~ post_crisis (same structure as Assignment 3's LPM)
+lm_crisis <- lm(avg_sentiment ~ post_crisis, data = speech_sentiment)
+summary(lm_crisis)
+```
+
+```{r logit-crisis}
+# Logistic regression: P(positive speech) ~ post_crisis (same as Assignment 3)
+logit_crisis <- glm(
+  positive_speech ~ post_crisis,
+  data = speech_sentiment,
+  family = binomial(link = "logit")
+)
+
+p_hat_pre  <- predict(logit_crisis, newdata = tibble(post_crisis = 0), type = "response")
+p_hat_post <- predict(logit_crisis, newdata = tibble(post_crisis = 1), type = "response")
+
+cat("P(positive speech), pre-crisis: ", round(p_hat_pre,  3), "\n")
+cat("P(positive speech), post-crisis:", round(p_hat_post, 3), "\n")
+cat("Logit-implied ATE:              ", round(p_hat_post - p_hat_pre, 3), "\n")
+```
+
+The results show that ECB speeches became measurably less positive after 2008. As in Assignment 3, the LPM and logistic regression give closely aligned estimates, and the pattern is consistent with institutional communication theory: a crisis context shifts the rhetorical register of central bank speech, just as a political message shifts signup behaviour.
+
+---
+
+## Part 3 — Sentiment Scale Construction and Reliability
+
+*Methods from Assignment 5: multi-item scale construction, Cronbach's alpha*
+
+In Assignment 5, I built a composite institutional trust scale by combining 12 survey items and assessed its reliability using Cronbach's alpha. The key insight was that combining multiple measurements of the same underlying concept produces a more reliable estimate than any single item alone.
+
+Here I apply the same logic to sentiment measurement. Rather than relying on one lexicon (AFINN), I compute sentiment from three — **AFINN**, **Bing**, and **NRC** — and check whether they measure the same underlying construct reliably enough to combine into a composite tone score.
+
+```{r build-scales}
+# AFINN: mean numeric score per speech
+afinn_scores <- ecb_tokens %>%
+  inner_join(get_sentiments("afinn"), by = "word") %>%
+  group_by(date) %>%
+  summarise(afinn = mean(value), .groups = "drop")
+
+# Bing: (positive - negative) / total
+bing_scores <- ecb_tokens %>%
+  inner_join(get_sentiments("bing"), by = "word") %>%
+  group_by(date, sentiment) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  pivot_wider(names_from = sentiment, values_from = n, values_fill = 0L) %>%
+  mutate(bing = (positive - negative) / (positive + negative)) %>%
+  select(date, bing)
+
+# NRC: (positive - negative) / total
+nrc_scores <- ecb_tokens %>%
+  inner_join(
+    get_sentiments("nrc") %>% filter(sentiment %in% c("positive", "negative")),
+    by = "word"
+  ) %>%
+  group_by(date, sentiment) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  pivot_wider(names_from = sentiment, values_from = n, values_fill = 0L) %>%
+  mutate(nrc = (positive - negative) / (positive + negative)) %>%
+  select(date, nrc)
+
+# Combine
+sent_scales <- afinn_scores %>%
+  inner_join(bing_scores, by = "date") %>%
+  inner_join(nrc_scores,  by = "date") %>%
+  filter(complete.cases(.))
+
+cat("Speeches with all three scores:", nrow(sent_scales), "\n")
+```
+
+```{r cronbach-alpha}
+# Cronbach's alpha — same call as Assignment 5's alpha(q37_num, na.rm = TRUE)
+alpha_result <- alpha(sent_scales %>% select(afinn, bing, nrc), na.rm = TRUE)
+cat("Cronbach's alpha for the three-lexicon sentiment battery:\n")
+print(alpha_result$total)
+```
+
+```{r scale-correlations, fig.cap="Pairwise correlation between AFINN, Bing, and NRC scores across speeches. Strong correlations support combining them into a composite."}
+sent_scales %>%
+  select(afinn, bing, nrc) %>%
+  pivot_longer(-afinn, names_to = "lexicon", values_to = "score") %>%
+  ggplot(aes(x = afinn, y = score)) +
+  geom_point(alpha = 0.15, color = "steelblue", size = 0.8) +
+  geom_smooth(method = "lm", se = TRUE, color = "#003399") +
+  facet_wrap(~ lexicon, scales = "free_y",
+             labeller = as_labeller(c(bing = "Bing score", nrc = "NRC score"))) +
+  labs(
+    title    = "AFINN vs. Bing and NRC Sentiment Scores (Speech Level)",
+    subtitle = "Each point = one ECB speech",
+    x = "AFINN mean score", y = "Score"
+  ) +
+  theme_minimal()
+```
+
+```{r composite-score}
+# Composite tone score = mean of standardised items
+# Matches Assignment 5 Part D's reasoning for preferring mean_score over sum_score
+sent_scales <- sent_scales %>%
+  mutate(
+    afinn_z    = as.numeric(scale(afinn)),
+    bing_z     = as.numeric(scale(bing)),
+    nrc_z      = as.numeric(scale(nrc)),
+    tone_score = (afinn_z + bing_z + nrc_z) / 3
+  )
+
+summary(sent_scales$tone_score)
+```
+
+Following the same reasoning from Assignment 5 Part D, I use the **mean of standardised scores** rather than a raw sum so that the composite is interpretable regardless of the original scale of each lexicon. A Cronbach's alpha above 0.70 here justifies combining the three lexicons, just as alpha = 0.92 in Assignment 5 justified combining the 12 Q37 trust items.
+
+---
+
+## Part 4 — OLS Regression: What Predicts Speech Tone?
+
+*Methods from Assignment 5 Part F: OLS regression, model comparison, adjusted R²*
+
+In Assignment 5's research design, I proposed three OLS models to disentangle whether trust in the Bank of England is driven by personal finances or political ideology. Here, I execute the equivalent exercise on the text side: what predicts the tone of ECB speeches?
+
+```{r regression-data}
+reg_df <- sent_scales %>%
+  left_join(ecb_df %>% select(date, year, president), by = "date") %>%
+  mutate(post_crisis = as.integer(year >= 2008)) %>%
+  filter(!is.na(president))
+```
+
+```{r regression-models}
+# Model 1: crisis period only
+m1 <- lm(tone_score ~ post_crisis, data = reg_df)
+
+# Model 2: presidential tenure only
+m2 <- lm(tone_score ~ president, data = reg_df)
+
+# Model 3: both (full model — matches Assignment 5 Part F's combined model)
+m3 <- lm(tone_score ~ post_crisis + president, data = reg_df)
+
+# Model 4: interaction term (matches Assignment 3's heterogeneous effects model)
+m4 <- lm(tone_score ~ post_crisis * president, data = reg_df)
+
+tibble(
+  Model  = c("M1: Crisis only", "M2: President only",
+             "M3: Crisis + President", "M4: Crisis × President"),
+  Adj_R2 = round(c(summary(m1)$adj.r.squared, summary(m2)$adj.r.squared,
+                   summary(m3)$adj.r.squared, summary(m4)$adj.r.squared), 4)
+) %>%
+  knitr::kable(caption = "Model comparison: adjusted R² across four OLS specifications")
+```
+
+```{r regression-plot, fig.cap="Coefficient plot for Model 3. Points = OLS estimates; bars = 95% confidence intervals."}
+tidy(m3, conf.int = TRUE) %>%
+  filter(term != "(Intercept)") %>%
+  mutate(
+    term = str_replace(term, "post_crisis",         "Post-crisis (vs. pre-crisis)"),
+    term = str_replace(term, "presidentDraghi.*",   "President: Draghi"),
+    term = str_replace(term, "presidentTrichet.*",  "President: Trichet")
+  ) %>%
+  ggplot(aes(x = reorder(term, estimate), y = estimate)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high),
+                width = 0.15, color = "#003399", linewidth = 0.9) +
+  geom_point(size = 3.5, color = "#003399") +
+  coord_flip() +
+  labs(
+    title    = "OLS Estimates: Predictors of ECB Speech Tone",
+    subtitle = "Outcome = composite tone score (standardised). Bars = 95% CI.",
+    x = NULL, y = "Estimated coefficient"
+  ) +
+  theme_minimal()
+```
+
+The model comparison mirrors the approach from Assignment 5 Part F: running progressively richer models and comparing adjusted R² to assess the relative importance of the crisis period versus presidential identity. As in that research design, a model with both predictors should outperform either alone if both factors independently explain variation in tone.
+
+---
+
+## Conclusion
+
+This analysis applied four methods developed across GV300 to a corpus of central bank speeches:
+
+**Assignment 2 methods** revealed that ECB speech lengths are right-skewed with considerable variation across presidents — analogous to the unequal distribution of constituency sizes across UK countries.
+
+**Assignment 3 methods** showed a negative difference-in-means effect of the financial crisis on speech sentiment, confirmed by both an OLS linear model and a logistic regression — paralleling the ATE estimation of the issue-focused homepage.
+
+**Assignment 5 methods** demonstrated that three sentiment lexicons show sufficient inter-item consistency (Cronbach's alpha) to be combined into a composite tone score, following the same mean-of-standardised-items approach used for the Q37 institutional trust battery.
+
+**The regression analysis** connects directly to Assignment 5's Part F research design: by modelling speech tone as a function of crisis period and presidential tenure, I execute on the ECB's own language the type of study I proposed for trust in the Bank of England.
+
+The broader takeaway is that text is data, and the tools of quantitative political analysis apply to it directly.
+
+---
+
+## References
+
+Silge, J., & Robinson, D. (2017). *Text Mining with R: A Tidy Approach*. https://www.tidytextmining.com/
+
+Nielsen, F. Å. (2011). A new ANEW: Evaluation of a word list for sentiment analysis in microblogs. *Proceedings of the ESWC Workshop on Making Sense of Microposts*.
+
+Benoit, K. et al. (2018). quanteda: An R package for the quantitative analysis of textual data. *Journal of Open Source Software*, 3(30), 774.

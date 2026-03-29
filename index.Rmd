@@ -4,6 +4,8 @@ image: "images/profile.jpg"
 links:
   - label: GV300 Showcase
     url: "gv300-showcase.html"
+  - label: Text Analysis
+    url: "text-analysis.html"
   - label: About
     url: "about.html"
   - label: GitHub
