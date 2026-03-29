@@ -27,6 +27,8 @@ jobs:
             libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev
 
       - name: Install R packages
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
           Rscript -e '
             install.packages(c(
