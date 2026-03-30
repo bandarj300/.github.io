@@ -35,7 +35,7 @@ jobs:
           Rscript -e '
             install.packages(c(
               "distill", "postcards", "rmarkdown",
-              "tidyverse", "tidytext", "textdata",
+              "tidyverse", "tidytext", "lexicon",
               "ggwordcloud", "psych", "broom", "patchwork",
               "quanteda", "lubridate", "scales", "remotes"
             ), repos = "https://packagemanager.posit.co/cran/__linux__/jammy/latest")

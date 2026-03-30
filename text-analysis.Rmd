@@ -35,6 +35,7 @@ In this section, I apply text analysis methods to the full corpus of US Presiden
 ```{r packages}
 library(tidyverse)
 library(tidytext)
+library(lexicon)
 library(quanteda)
 library(ggwordcloud)
 library(psych)
@@ -186,8 +187,12 @@ In Assignment 3, I estimated the Average Treatment Effect of an issue-focused ho
 I define "treatment" as speaking in the post-WWII era (1945 onwards), and the outcome as the average AFINN sentiment score of a speech.
 
 ```{r speech-sentiment}
+afinn_dict <- lexicon::hash_sentiment_afinn %>%
+  as_tibble() %>%
+  rename(word = x, value = y)
+
 speech_sentiment <- tokens_df %>%
-  inner_join(get_sentiments("afinn"), by = "word") %>%
+  inner_join(afinn_dict, by = "word") %>%
   group_by(full_name, President, Party, Year, era, post_ww2) %>%
   summarise(
     avg_sentiment   = mean(value),
@@ -265,25 +270,38 @@ As in Assignment 3, the LPM and logistic regression give closely aligned estimat
 In Assignment 5, I built a composite institutional trust scale by combining 12 survey items and assessed reliability using Cronbach's alpha. Here I apply the same logic to sentiment: rather than relying on one lexicon, I compute scores from three — AFINN, Bing, and NRC — and assess whether they are consistent enough to combine into a composite tone score.
 
 ```{r build-scales}
-# AFINN
+# AFINN — from lexicon package, no download needed
 afinn_sc <- tokens_df %>%
-  inner_join(get_sentiments("afinn"), by = "word") %>%
+  inner_join(
+    lexicon::hash_sentiment_afinn %>% as_tibble() %>% rename(word = x, value = y),
+    by = "word"
+  ) %>%
   group_by(Year) %>%
   summarise(afinn = mean(value), .groups = "drop")
 
-# Bing
+# Bing equivalent — Hu & Liu opinion lexicon, built into lexicon package
 bing_sc <- tokens_df %>%
-  inner_join(get_sentiments("bing"), by = "word") %>%
+  inner_join(
+    lexicon::hash_sentiment_huliu %>% as_tibble() %>%
+      rename(word = x) %>%
+      mutate(sentiment = if_else(y > 0, "positive", "negative")) %>%
+      select(word, sentiment),
+    by = "word"
+  ) %>%
   group_by(Year, sentiment) %>%
   summarise(n = n(), .groups = "drop") %>%
   pivot_wider(names_from = sentiment, values_from = n, values_fill = 0L) %>%
   mutate(bing = (positive - negative) / (positive + negative)) %>%
   select(Year, bing)
 
-# NRC
+# NRC — built into lexicon package as nrc_emotions
 nrc_sc <- tokens_df %>%
   inner_join(
-    get_sentiments("nrc") %>% filter(sentiment %in% c("positive", "negative")),
+    lexicon::nrc_emotions %>% as_tibble() %>%
+      select(word = term, positive, negative) %>%
+      pivot_longer(-word, names_to = "sentiment", values_to = "v") %>%
+      filter(v == 1) %>%
+      select(word, sentiment),
     by = "word"
   ) %>%
   group_by(Year, sentiment) %>%
