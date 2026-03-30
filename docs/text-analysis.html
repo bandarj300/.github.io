@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Text Analysis | Bandar Jamous</title>
+  <meta name="description" content="Text analysis of open-ended survey responses on banking exclusion and online banking barriers using the homework dataset.">
+  <link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="index.html" aria-label="Go to home page">
+        <strong>Bandar Jamous</strong>
+        <span>Politics, data analysis, and quantitative methods</span>
+      </a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="gv300-showcase.html">GV300 Showcase</a>
+        <a class="is-active" href="text-analysis.html">Text Analysis</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-shell">
+    <section class="hero">
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <span class="eyebrow">Text Analysis</span>
+          <h1>Open-ended responses reveal how banking exclusion is described in plain language.</h1>
+          <p class="lede">
+            This section uses my own homework dataset rather than an outside corpus. I analyse the open-ended “Other” responses in the <code>run_unbanked</code> survey, focusing on two text fields: barriers to getting a bank account and reasons people do not use online banking.
+          </p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="https://bandarj300.github.io/.github.io/text-analysis.html">Share this page</a>
+            <a class="button button-secondary" href="gv300-showcase.html">Back to GV300</a>
+          </div>
+        </div>
+
+        <aside class="hero-card">
+          <div>
+            <span class="muted-label">Dataset Basis</span>
+            <h2>Text analysis built from the same survey data used in my coursework</h2>
+          </div>
+          <p>
+            The analysis is based on the open-ended text columns <code>Q27_10_TEXT</code> and <code>Q31_10_TEXT</code> in the exported <code>run_unbanked</code> dataset. That keeps the project grounded in my own homework materials while still demonstrating actual text-analysis methods.
+          </p>
+          <div class="pill-row">
+            <span class="pill">Survey text</span>
+            <span class="pill">Word frequency</span>
+            <span class="pill">Theme coding</span>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="metrics-grid">
+        <article class="metric-card">
+          <strong>153</strong>
+          <span>Substantive answers in Q27</span>
+          <small>Other reasons people may struggle to get a bank account</small>
+        </article>
+        <article class="metric-card">
+          <strong>90</strong>
+          <span>Substantive answers in Q31</span>
+          <small>Other reasons people may not use online banking</small>
+        </article>
+        <article class="metric-card">
+          <strong>39.9%</strong>
+          <span>Q27 responses coded as housing or address barriers</span>
+          <small>The clearest theme in access-related answers</small>
+        </article>
+        <article class="metric-card">
+          <strong>56.7%</strong>
+          <span>Q31 responses coded as age or digital-skill barriers</span>
+          <small>The dominant online-banking pattern</small>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="split-grid">
+        <article class="content-card">
+          <span class="muted-label">Method</span>
+          <h2 class="card-title">How the text analysis was done</h2>
+          <ul class="list-tight">
+            <li>I extracted the open-ended text responses from the homework dataset rather than using an outside corpus.</li>
+            <li>I removed blank entries and non-substantive answers such as <code>NA</code>, <code>None</code>, and <code>Don't know</code>.</li>
+            <li>I compared recurring words and short phrases across the two text fields.</li>
+            <li>I added simple rule-based theme coding to group responses into recurring categories such as address barriers, age, and digital skills.</li>
+          </ul>
+        </article>
+
+        <article class="content-card">
+          <span class="muted-label">Why this counts as text analysis</span>
+          <h2 class="card-title">Text as evidence, not just quotation</h2>
+          <p>
+            The goal is not just to display individual comments. It is to treat short open-ended answers as data: clean them, compare repeated language, identify dominant themes, and interpret what those patterns say about financial exclusion.
+          </p>
+          <p>
+            That makes this a genuine text-analysis section while staying fully tied to my own coursework materials.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-heading">
+        <div>
+          <h2>Bank Account Access Barriers</h2>
+        </div>
+        <p>
+          The most striking feature of the Q27 responses is how often exclusion is described in terms of address instability. The repeated language suggests that practical eligibility barriers matter as much as personal preference.
+        </p>
+      </div>
+
+      <div class="card-grid">
+        <article class="content-card">
+          <span class="muted-label">Most frequent terms</span>
+          <h3 class="card-title">What appears repeatedly in Q27</h3>
+          <div class="tag-list">
+            <span class="tag"><strong>address</strong> 49</span>
+            <span class="tag"><strong>homeless</strong> 29</span>
+            <span class="tag"><strong>fixed</strong> 21</span>
+            <span class="tag"><strong>permanent</strong> 11</span>
+            <span class="tag"><strong>money</strong> 6</span>
+            <span class="tag"><strong>cash</strong> 6</span>
+          </div>
+          <p>
+            The vocabulary centres on address and residence much more than on attitudes toward banking. That points to material exclusion, especially the difficulty of meeting formal address requirements.
+          </p>
+        </article>
+
+        <article class="quote-card">
+          <p>
+            Typical responses include phrases such as “no fixed address”, “homeless”, and “can’t prove address”, which all point toward the same practical barrier.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <article class="content-card">
+        <span class="muted-label">Theme coding</span>
+        <h2 class="card-title">Q27 coded themes</h2>
+        <div class="bar-list" aria-label="Theme coding for Q27 text responses">
+          <div class="bar-row">
+            <span class="bar-label">Housing or address barrier</span>
+            <div class="bar-track"><div class="bar-fill" style="width: 100%;"></div></div>
+            <span class="bar-value">61</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-label">Financial barrier</span>
+            <div class="bar-track"><div class="bar-fill" style="width: 23%;"></div></div>
+            <span class="bar-value">14</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-label">Capability or health barrier</span>
+            <div class="bar-track"><div class="bar-fill" style="width: 21%;"></div></div>
+            <span class="bar-value">13</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-label">Identity or document barrier</span>
+            <div class="bar-track"><div class="bar-fill" style="width: 7%;"></div></div>
+            <span class="bar-value">4</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-label">Technology or fraud barrier</span>
+            <div class="bar-track"><div class="bar-fill" style="width: 5%;"></div></div>
+            <span class="bar-value">3</span>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="section">
+      <div class="section-heading">
+        <div>
+          <h2>Online Banking Barriers</h2>
+        </div>
+        <p>
+          The Q31 responses shift away from address problems and toward digital exclusion. Here the language is dominated by age, internet access, and confidence with technology.
+        </p>
+      </div>
+
+      <div class="card-grid">
+        <article class="content-card">
+          <span class="muted-label">Most frequent terms</span>
+          <h3 class="card-title">What appears repeatedly in Q31</h3>
+          <div class="tag-list">
+            <span class="tag"><strong>internet</strong> 12</span>
+            <span class="tag"><strong>elderly</strong> 10</span>
+            <span class="tag"><strong>access</strong> 7</span>
+            <span class="tag"><strong>understand</strong> 7</span>
+            <span class="tag"><strong>technology</strong> 6</span>
+            <span class="tag"><strong>computer</strong> 4</span>
+          </div>
+          <p>
+            The word frequencies point clearly toward digital skills and age-related hesitation rather than simple lack of interest. The issue is not only whether online banking exists, but whether people feel able to use it.
+          </p>
+        </article>
+
+        <article class="quote-card">
+          <p>
+            Responses repeatedly describe people as “too old”, unsure how to use computers or phones, or more comfortable with face-to-face banking.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <article class="content-card">
+        <span class="muted-label">Theme coding</span>
+        <h2 class="card-title">Q31 coded themes</h2>
+        <div class="bar-list" aria-label="Theme coding for Q31 text responses">
+          <div class="bar-row">
+            <span class="bar-label">Digital skills or access barrier</span>
+            <div class="bar-track"><div class="bar-fill" style="width: 100%;"></div></div>
+            <span class="bar-value">26</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-label">Age-related barrier</span>
+            <div class="bar-track"><div class="bar-fill" style="width: 96%;"></div></div>
+            <span class="bar-value">25</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-label">Structural exclusion</span>
+            <div class="bar-track"><div class="bar-fill" style="width: 27%;"></div></div>
+            <span class="bar-value">7</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-label">Preference or no perceived need</span>
+            <div class="bar-track"><div class="bar-fill" style="width: 12%;"></div></div>
+            <span class="bar-value">3</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-label">Fraud or security concern</span>
+            <div class="bar-track"><div class="bar-fill" style="width: 12%;"></div></div>
+            <span class="bar-value">3</span>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="section">
+      <div class="split-grid">
+        <article class="table-wrap">
+          <span class="muted-label">Comparison</span>
+          <h2 class="card-title">What changes between the two text fields</h2>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Text field</th>
+                <th>Main pattern</th>
+                <th>Interpretation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Q27_10_TEXT</td>
+                <td>Address and residence language</td>
+                <td>Access to banking is often framed as an eligibility problem</td>
+              </tr>
+              <tr>
+                <td>Q31_10_TEXT</td>
+                <td>Age, internet, and technology language</td>
+                <td>Online banking exclusion is framed as a skills and adaptation problem</td>
+              </tr>
+            </tbody>
+          </table>
+        </article>
+
+        <article class="content-card">
+          <span class="muted-label">Interpretation</span>
+          <h2 class="card-title">Why this matters substantively</h2>
+          <p>
+            The two text fields point to different forms of exclusion. Bank account access is described mainly through address instability and formal eligibility requirements, while online banking exclusion is described more through ageing, technology, and lack of digital confidence.
+          </p>
+          <p>
+            That distinction matters because it shows that “financial exclusion” is not one single problem. Different barriers appear in different parts of the banking process, and the text responses make those differences visible.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="split-grid">
+        <article class="content-card">
+          <span class="muted-label">R Workflow Example</span>
+          <h2 class="card-title">How this analysis can be done in code</h2>
+          <pre class="code-block"><code>library(tidyverse)
+library(tidytext)
+
+text_df &lt;- run_unbanked |&gt;
+  select(Q27_10_TEXT, Q31_10_TEXT) |&gt;
+  pivot_longer(everything(), names_to = "question", values_to = "text") |&gt;
+  filter(!is.na(text), text != "")
+
+tokens &lt;- text_df |&gt;
+  unnest_tokens(word, text) |&gt;
+  anti_join(stop_words, by = "word")
+
+top_words &lt;- tokens |&gt;
+  count(question, word, sort = TRUE)</code></pre>
+        </article>
+
+        <article class="content-card">
+          <span class="muted-label">Why this belongs on the site</span>
+          <h2 class="card-title">What this project demonstrates</h2>
+          <ul class="list-tight">
+            <li>It is an actual text-analysis section built from my own homework data rather than an outside corpus.</li>
+            <li>It combines basic NLP-style frequency work with interpretable qualitative theme coding.</li>
+            <li>It adds a different kind of evidence to the website than the numerical GV300 election showcase.</li>
+          </ul>
+          <div class="note">
+            All figures and categories on this page were compiled from the exported <code>run_unbanked</code> survey data you provided in the workspace.
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <span><strong>Project link:</strong> <a href="https://bandarj300.github.io/.github.io/text-analysis.html">bandarj300.github.io/.github.io/text-analysis.html</a></span>
+      <span><a href="gv300-showcase.html">View the GV300 showcase</a></span>
+    </div>
+  </footer>
+</body>
+</html>

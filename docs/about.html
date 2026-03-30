@@ -3,54 +3,125 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>About - Bandar's Personal Site</title>
-  <meta name="description" content="A bit more about me and this site.">
-  <link rel="stylesheet" href="site_libs/distill-2.2.21/distill.css">
+  <title>About | Bandar Jamous</title>
+  <meta name="description" content="About Bandar Jamous, his academic interests, and the purpose of this portfolio site.">
+  <link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
-
-<nav class="distill-site-nav">
-  <div class="nav-container">
-    <div class="nav-left">
-      <a href="index.html">Bandar's Personal Site</a>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="index.html" aria-label="Go to home page">
+        <strong>Bandar Jamous</strong>
+        <span>Politics, data analysis, and quantitative methods</span>
+      </a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a class="is-active" href="about.html">About</a>
+        <a href="gv300-showcase.html">GV300 Showcase</a>
+        <a href="text-analysis.html">Text Analysis</a>
+      </nav>
     </div>
-    <div class="nav-right">
-      <a href="index.html">Home</a>
-      <a href="about.html" class="active">About</a>
-      <a href="gv300-showcase.html">GV300 Showcase</a>
-    </div>
-  </div>
-</nav>
-
-<article class="distill-article">
-  <header class="distill-article-header">
-    <h1>About</h1>
-    <p class="description">A bit more about me and this site.</p>
   </header>
 
-  <h2 id="about-this-site">About This Site</h2>
-  <p>This website was built using the <a href="https://rstudio.github.io/distill/">Distill</a> and <a href="https://github.com/seankross/postcards">Postcards</a> R packages, following the workflow described by <a href="https://www.apreshill.com/blog/2020-12-postcards-distill/">Alison Hill</a>.</p>
-  <p>The site is hosted on GitHub Pages and serves as a portfolio for my academic work in GV300 and related courses.</p>
+  <main class="page-shell">
+    <section class="hero">
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <span class="eyebrow">About</span>
+          <h1>Why this site exists and what kind of work it is meant to show.</h1>
+          <p class="lede">
+            I wanted this portfolio to do more than list coursework. It is designed to show how I approach political data: with a focus on clear research questions, transparent methods, and visual communication that makes the results easy to understand.
+          </p>
+        </div>
 
-  <h2 id="about-me">About Me</h2>
-  <p>I am a university student studying political science with a focus on quantitative methods. My coursework in GV300 has involved working with data in R, producing statistical analyses, and creating visualisations to communicate findings clearly.</p>
+        <aside class="hero-card">
+          <div>
+            <span class="muted-label">Profile</span>
+            <h2>Politics and International Relations student</h2>
+          </div>
+          <p>
+            My academic interests centre on quantitative political analysis, especially where data work can strengthen the explanation of institutions, elections, and political behaviour.
+          </p>
+          <div class="stat-line">
+            <div>
+              <span class="muted-label">Priority</span>
+              <strong>Clarity</strong>
+            </div>
+            <span>Method first, explanation second, presentation throughout</span>
+          </div>
+        </aside>
+      </div>
+    </section>
 
-  <h2 id="tools">Tools and Technologies</h2>
-  <ul>
-    <li><strong>R and RStudio</strong> for data analysis and visualisation</li>
-    <li><strong>ggplot2</strong> for creating publication-quality figures</li>
-    <li><strong>Distill</strong> for building this website</li>
-    <li><strong>Postcards</strong> for the landing page design</li>
-    <li><strong>Git and GitHub</strong> for version control and hosting</li>
-  </ul>
+    <section class="section">
+      <div class="split-grid">
+        <article class="content-card">
+          <span class="muted-label">About Me</span>
+          <h2 class="card-title">Academic profile</h2>
+          <p>
+            I am a final-year student studying politics with a strong interest in quantitative methods. In GV300, I worked with real political datasets in R, produced statistical summaries, built visualisations, and used code to answer substantive political questions.
+          </p>
+          <p>
+            The work on this site reflects the parts of the course I enjoy most: transforming raw data into clear evidence and writing up findings in a way that is concise, professional, and public facing.
+          </p>
+        </article>
 
-  <h2 id="contact">Contact</h2>
-  <p>You can find my work on <a href="https://github.com/bandarj300">GitHub</a>.</p>
-</article>
+        <article class="content-card">
+          <span class="muted-label">Academic Interests</span>
+          <h2 class="card-title">Main areas of interest</h2>
+          <div class="pill-row">
+            <span class="pill">Quantitative political analysis</span>
+            <span class="pill">Statistical methods</span>
+            <span class="pill">Political communication</span>
+            <span class="pill">Data visualisation</span>
+          </div>
+          <p>
+            I am especially interested in projects where the analysis can move between different kinds of evidence, such as electoral data, institutional indicators, and political texts.
+          </p>
+        </article>
+      </div>
+    </section>
 
-<footer class="distill-site-footer">
-  <p>&copy; 2026 Bandar J. Built with <a href="https://rstudio.github.io/distill/">Distill</a> and <a href="https://github.com/seankross/postcards">Postcards</a> for R.</p>
-</footer>
+    <section class="section">
+      <div class="card-grid">
+        <article class="content-card">
+          <span class="muted-label">Tools and Technologies</span>
+          <h3 class="card-title">What I use</h3>
+          <ul class="list-tight">
+            <li><strong>R and RStudio</strong> for analysis, modelling, and report writing</li>
+            <li><strong>tidyverse and ggplot2</strong> for data cleaning and visualisation</li>
+            <li><strong>GitHub Pages</strong> for publishing coursework online</li>
+            <li><strong>Markdown-based workflows</strong> for reproducible, readable outputs</li>
+          </ul>
+        </article>
 
+        <article class="content-card">
+          <span class="muted-label">About This Site</span>
+          <h3 class="card-title">Portfolio purpose</h3>
+          <p>
+            This website serves as a portfolio for my GV300 work and related methods projects. It keeps the original homework-based GV300 showcase in place while adding a second project page that demonstrates text analysis using open-ended responses from my own survey dataset.
+          </p>
+          <p>
+            The structure is meant to be straightforward: visitors can quickly understand the site, then move into either an electoral data case study or a text-analysis case study built from homework data.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <article class="quote-card">
+        <p>
+          The strongest coursework pages do two things at once: they show the code and they show that the author understands why the method matters. That is the standard this site is aiming for.
+        </p>
+      </article>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <span><strong>GitHub:</strong> <a href="https://github.com/bandarj300">github.com/bandarj300</a></span>
+      <span>Portfolio built for academic presentation and public browsing.</span>
+    </div>
+  </footer>
 </body>
 </html>

@@ -3,57 +3,159 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bandar J - Personal Site</title>
-  <meta name="description" content="Personal website and GV300 showcase">
-  <link rel="stylesheet" href="site_libs/distill-2.2.21/distill.css">
-  <link rel="stylesheet" href="site_libs/postcards-1.0/trestles.css">
+  <title>Bandar Jamous | Quantitative Politics Portfolio</title>
+  <meta name="description" content="Portfolio site for quantitative political analysis, including a GV300 showcase and a Homework 5 methods project.">
+  <link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
-
-<nav class="distill-site-nav">
-  <div class="nav-container">
-    <div class="nav-left">
-      <a href="index.html">Bandar's Personal Site</a>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="index.html" aria-label="Go to home page">
+        <strong>Bandar Jamous</strong>
+        <span>Politics, data analysis, and quantitative methods</span>
+      </a>
+      <nav class="site-nav" aria-label="Primary">
+        <a class="is-active" href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="gv300-showcase.html">GV300 Showcase</a>
+        <a href="text-analysis.html">Text Analysis</a>
+      </nav>
     </div>
-    <div class="nav-right">
-      <a href="index.html" class="active">Home</a>
-      <a href="about.html">About</a>
-      <a href="gv300-showcase.html">GV300 Showcase</a>
+  </header>
+
+  <main class="page-shell">
+    <section class="hero">
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <span class="eyebrow">Academic Portfolio</span>
+          <h1>Political analysis presented with code, evidence, and clear explanation.</h1>
+          <p class="lede">
+            This website brings together my work in quantitative political analysis, with one section focused on my GV300 electoral data showcase and another focused on text analysis built from my own homework dataset. The goal is simple: present coursework in a way that is more professional, easier to navigate, and stronger as a public-facing portfolio.
+          </p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="gv300-showcase.html">Open GV300 Showcase</a>
+            <a class="button button-secondary" href="text-analysis.html">Read Text Analysis</a>
+            <a class="button button-secondary" href="https://github.com/bandarj300">View GitHub</a>
+          </div>
+        </div>
+
+        <aside class="hero-card" aria-label="Profile summary">
+          <div>
+            <span class="muted-label">Current Focus</span>
+            <h2>GV300 and reproducible political data work</h2>
+          </div>
+          <p>
+            I am a final-year student in politics and international relations with a strong interest in quantitative methods, data visualisation, and using R to communicate political questions clearly.
+          </p>
+          <div class="stat-line">
+            <div>
+              <span class="muted-label">Featured Projects</span>
+              <strong>2</strong>
+            </div>
+            <span>Election data and open-ended survey text</span>
+          </div>
+          <div class="stat-line">
+            <div>
+              <span class="muted-label">Core Tools</span>
+              <strong>R</strong>
+            </div>
+            <span>tidyverse, ggplot2, GitHub Pages</span>
+          </div>
+          <div class="stat-line">
+            <div>
+              <span class="muted-label">Site Purpose</span>
+              <strong>Coursework Portfolio</strong>
+            </div>
+            <span>Professional presentation of my academic work</span>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-heading">
+        <div>
+          <h2>About Me</h2>
+        </div>
+        <p>
+          I built this site as a clean portfolio of coursework that shows both technical skill and the ability to explain results clearly. It keeps my original GV300 showcase while expanding the site with a dedicated text-analysis section based on my own survey data.
+        </p>
+      </div>
+
+      <div class="split-grid">
+        <article class="content-card">
+          <span class="muted-label">Academic Interests</span>
+          <h3 class="card-title">What I like working on</h3>
+          <div class="pill-row">
+            <span class="pill">Quantitative political analysis</span>
+            <span class="pill">Data visualisation</span>
+            <span class="pill">Statistical reasoning</span>
+            <span class="pill">Reproducible research</span>
+          </div>
+          <p>
+            My coursework in GV300 has focused on turning political questions into structured analysis: cleaning data, comparing patterns, producing visual evidence, and writing up conclusions in a way that stays close to the underlying data.
+          </p>
+        </article>
+
+        <article class="content-card">
+          <span class="muted-label">Current Work</span>
+          <h3 class="card-title">What this site now showcases</h3>
+          <ul class="list-tight">
+            <li>A GV300 project on inequality in constituency size and turnout across the UK.</li>
+            <li>A text-analysis project built from open-ended responses in the homework dataset.</li>
+            <li>A public-facing structure that is easier to browse than a raw repository.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-heading">
+        <div>
+          <h2>Featured Project Showcases</h2>
+        </div>
+        <p>
+          The site is organised around two project pages so visitors can move quickly from a short overview into a focused methods showcase.
+        </p>
+      </div>
+
+      <div class="card-grid">
+        <article class="content-card project-card">
+          <span class="muted-label">Project 01</span>
+          <h3 class="card-title">GV300 Electoral Data Showcase</h3>
+          <p>
+            This page preserves my existing coursework showcase and presents it more clearly. It focuses on UK constituency-level election data, voter inequality, turnout patterns, and visual comparison across the four nations.
+          </p>
+          <div class="pill-row">
+            <span class="pill">Election results</span>
+            <span class="pill">Turnout analysis</span>
+            <span class="pill">ggplot2 visuals</span>
+          </div>
+          <p><a href="gv300-showcase.html">Open the showcase</a></p>
+        </article>
+
+        <article class="content-card project-card">
+          <span class="muted-label">Project 02</span>
+          <h3 class="card-title">Text Analysis of Banking Barriers</h3>
+          <p>
+            This second project uses the same survey dataset from my homework work, but focuses specifically on open-ended text responses. It highlights recurring barriers to bank access and online banking through word frequency and simple thematic coding.
+          </p>
+          <div class="pill-row">
+            <span class="pill">Open-ended responses</span>
+            <span class="pill">Keyword coding</span>
+            <span class="pill">Theme comparison</span>
+          </div>
+          <p><a href="text-analysis.html">Read the analysis</a></p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <span><strong>Live portfolio:</strong> <a href="https://bandarj300.github.io/.github.io/">bandarj300.github.io/.github.io/</a></span>
+      <span>Built for coursework presentation and hosted on GitHub Pages.</span>
     </div>
-  </div>
-</nav>
-
-<div class="postcards-trestles">
-  <div class="profile-sidebar">
-    <div class="profile-image-placeholder">B</div>
-    <h1 class="profile-name">Bandar J</h1>
-    <ul class="profile-links">
-      <li><a href="gv300-showcase.html">GV300 Showcase</a></li>
-      <li><a href="about.html">About</a></li>
-      <li><a href="https://github.com/bandarj300">GitHub</a></li>
-    </ul>
-  </div>
-
-  <div class="profile-content">
-    <h2>About Me</h2>
-    <p>Welcome to my personal website. I am a student with interests in political science, data analysis, and quantitative methods. This site showcases my academic work, including projects and visualisations from GV300.</p>
-
-    <h2>Academic Interests</h2>
-    <ul>
-      <li>Quantitative political analysis</li>
-      <li>Data visualisation and communication</li>
-      <li>Statistical methods in social science</li>
-      <li>Reproducible research practices</li>
-    </ul>
-
-    <h2>Current Work</h2>
-    <p>I am currently enrolled in GV300, where I apply computational methods to political science questions. Browse my <a href="gv300-showcase.html">GV300 Showcase</a> to see examples of my best code and visualisations from the course.</p>
-  </div>
-</div>
-
-<footer class="distill-site-footer" style="max-width:900px;">
-  <p>&copy; 2026 Bandar J. Built with <a href="https://rstudio.github.io/distill/">Distill</a> and <a href="https://github.com/seankross/postcards">Postcards</a> for R.</p>
-</footer>
-
+  </footer>
 </body>
 </html>
