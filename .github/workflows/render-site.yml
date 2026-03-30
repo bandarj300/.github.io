@@ -36,7 +36,7 @@ jobs:
             install.packages(c(
               "distill", "postcards", "rmarkdown",
               "tidyverse", "tidytext", "textdata",
-              "ggwordcloud", "psych", "broom",
+              "ggwordcloud", "psych", "broom", "patchwork",
               "quanteda", "lubridate", "scales", "remotes"
             ), repos = "https://packagemanager.posit.co/cran/__linux__/jammy/latest")
             remotes::install_github("quanteda/quanteda.corpora")
