@@ -39,7 +39,6 @@ jobs:
               "ggwordcloud", "psych", "broom", "patchwork",
               "quanteda", "lubridate", "scales", "remotes"
             ), repos = "https://packagemanager.posit.co/cran/__linux__/jammy/latest")
-            remotes::install_github("quanteda/quanteda.corpora")
           '
 
       - name: Render site
